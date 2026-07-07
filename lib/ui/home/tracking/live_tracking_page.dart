@@ -241,7 +241,9 @@ class LiveTrackingPage extends StatelessWidget {
                       activeColor: Dell1996Colors.primary,
                       title: Text("COD (Bayar Tunai)", style: Dell1996Typography.body),
                       value: "COD",
+                      // ignore: deprecated_member_use
                       groupValue: metodePembayaranTerpilih,
+                      // ignore: deprecated_member_use
                       onChanged: (value) => setStateDialog(() => metodePembayaranTerpilih = value!),
                     ),
                   ),
@@ -252,7 +254,9 @@ class LiveTrackingPage extends StatelessWidget {
                       activeColor: Dell1996Colors.primary,
                       title: Text("Transfer Bank (Simulasi)", style: Dell1996Typography.body),
                       value: "Transfer",
+                      // ignore: deprecated_member_use
                       groupValue: metodePembayaranTerpilih,
+                      // ignore: deprecated_member_use
                       onChanged: (value) => setStateDialog(() => metodePembayaranTerpilih = value!),
                     ),
                   ),

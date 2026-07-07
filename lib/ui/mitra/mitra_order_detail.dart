@@ -145,6 +145,7 @@ class _MitraOrderDetailState extends State<MitraOrderDetail> {
                               controller: _sparepartController,
                               keyboardType: TextInputType.number,
                               hintText: "0",
+                              onChanged: (val) => _hitungTotal(),
                             ),
                             const SizedBox(height: Dell1996Spacing.md),
                             
@@ -154,6 +155,7 @@ class _MitraOrderDetailState extends State<MitraOrderDetail> {
                               controller: _jasaController,
                               keyboardType: TextInputType.number,
                               hintText: "0",
+                              onChanged: (val) => _hitungTotal(),
                             ),
                             const Divider(color: Dell1996Colors.frameInk, thickness: 1, height: 30),
                             

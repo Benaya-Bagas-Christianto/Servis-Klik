@@ -409,6 +409,7 @@ class Dell1996TextInput extends StatelessWidget {
   final bool obscureText;
   final TextInputType? keyboardType;
   final int? maxLines;
+  final ValueChanged<String>? onChanged;
 
   const Dell1996TextInput({
     super.key,
@@ -417,6 +418,7 @@ class Dell1996TextInput extends StatelessWidget {
     this.obscureText = false,
     this.keyboardType,
     this.maxLines = 1,
+    this.onChanged,
   });
 
   @override
@@ -432,6 +434,7 @@ class Dell1996TextInput extends StatelessWidget {
         obscureText: obscureText,
         keyboardType: keyboardType,
         maxLines: maxLines,
+        onChanged: onChanged,
         style: Dell1996Typography.body,
         decoration: InputDecoration(
           border: InputBorder.none,

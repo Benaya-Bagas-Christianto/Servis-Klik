@@ -157,7 +157,9 @@ class _PaymentPageState extends State<PaymentPage> {
             ],
           ),
           value: title,
+          // ignore: deprecated_member_use
           groupValue: _selectedPayment,
+          // ignore: deprecated_member_use
           onChanged: (String? value) {
             setState(() {
               _selectedPayment = value!;

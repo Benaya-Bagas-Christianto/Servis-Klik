@@ -10,6 +10,7 @@ import 'ui/profile/profile_page.dart';
 import 'ui/auth/login_page.dart';
 
 import 'theme/dell_1996_theme.dart';
+import 'widget/dell_1996_components.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
