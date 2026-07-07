@@ -76,6 +76,7 @@ class RiwayatServisPage extends StatelessWidget {
               const Dell1996TopBanner(
                 title: 'RIWAYAT SERVIS',
                 subtitle: 'Data Pesanan Selesai',
+                showBackButton: true,
               ),
               Expanded(
                 child: FutureBuilder<DocumentSnapshot>(

@@ -19,7 +19,8 @@ class DaftarTugasPage extends StatelessWidget {
               children: [
                 const Dell1996TopBanner(
                   title: 'DAFTAR TUGAS',
-                  subtitle: 'Manajemen perbaikan perangkat pelanggan',
+                  showBackButton: true,
+                  subtitle: 'Manajemen Order Servis',
                 ),
                 Container(
                   decoration: const BoxDecoration(

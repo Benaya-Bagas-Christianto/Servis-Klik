@@ -35,12 +35,14 @@ class Dell1996TopBanner extends StatelessWidget {
   final String title;
   final String? subtitle;
   final Widget? trailingWidget;
+  final bool showBackButton;
 
   const Dell1996TopBanner({
     super.key,
     required this.title,
     this.subtitle,
     this.trailingWidget,
+    this.showBackButton = false,
   });
 
   @override
@@ -54,6 +56,24 @@ class Dell1996TopBanner extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          if (showBackButton) ...[
+            GestureDetector(
+              onTap: () {
+                if (Navigator.canPop(context)) {
+                  Navigator.pop(context);
+                }
+              },
+              child: Container(
+                padding: const EdgeInsets.all(4),
+                margin: const EdgeInsets.only(right: Dell1996Spacing.md, top: 2),
+                decoration: BoxDecoration(
+                  color: Dell1996Colors.canvas,
+                  border: Border.all(color: Dell1996Colors.frameInk, width: 1),
+                ),
+                child: const Icon(Icons.arrow_back, size: 20, color: Dell1996Colors.frameInk),
+              ),
+            ),
+          ],
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

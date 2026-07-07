@@ -179,6 +179,7 @@ class _MitraWalletPageState extends State<MitraWalletPage> {
               const Dell1996TopBanner(
                 title: 'DOMPET TEKNISI',
                 subtitle: 'Sistem Pembayaran Internal',
+                showBackButton: true,
               ),
               Expanded(
                 child: Padding(

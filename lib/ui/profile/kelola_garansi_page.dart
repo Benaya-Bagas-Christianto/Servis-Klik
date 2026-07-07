@@ -54,7 +54,8 @@ class KelolaGaransiPage extends StatelessWidget {
             children: [
               const Dell1996TopBanner(
                 title: 'KELOLA GARANSI',
-                subtitle: 'Daftar Klaim Pelanggan',
+                subtitle: 'Daftar Pengajuan Klaim Pelanggan',
+                showBackButton: true,
               ),
               Expanded(
                 child: StreamBuilder<QuerySnapshot>(

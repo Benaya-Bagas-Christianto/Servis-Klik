@@ -30,8 +30,9 @@ class _MitraDocumentationPageState extends State<MitraDocumentationPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Dell1996TopBanner(
-                title: 'DOKUMENTASI FOTO',
-                subtitle: widget.orderId,
+                title: 'DOKUMENTASI TUGAS',
+                showBackButton: true,
+                subtitle: 'ID: ${widget.orderId}',
               ),
               Expanded(
                 child: SingleChildScrollView(

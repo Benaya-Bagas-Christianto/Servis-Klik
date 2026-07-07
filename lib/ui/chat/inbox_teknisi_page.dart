@@ -18,6 +18,7 @@ class InboxTeknisiPage extends StatelessWidget {
               const Dell1996TopBanner(
                 title: 'INBOX PELANGGAN',
                 subtitle: 'Daftar Pesan Masuk',
+                showBackButton: true,
               ),
               Expanded(
                 child: StreamBuilder<QuerySnapshot>(

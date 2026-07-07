@@ -31,7 +31,8 @@ class _PaymentPageState extends State<PaymentPage> {
             children: [
               const Dell1996TopBanner(
                 title: 'PEMBAYARAN',
-                subtitle: 'Selesaikan transaksi servis perangkat Anda',
+                subtitle: 'Konfirmasi Transaksi Anda',
+                showBackButton: true,
                 trailingWidget: Dell1996PhoneCallout(phoneNumber: '1-800-SERVIS'),
               ),
               Expanded(

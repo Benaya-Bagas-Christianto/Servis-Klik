@@ -172,41 +172,19 @@ class _ChatPageState extends State<ChatPage> {
         body: SafeArea(
           child: Column(
             children: [
-              Container(
-                color: Dell1996Colors.primary,
-                padding: const EdgeInsets.symmetric(vertical: Dell1996Spacing.sm, horizontal: Dell1996Spacing.md),
-                child: Row(
-                  children: [
-                    InkWell(
-                      onTap: () => Navigator.pop(context),
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: Dell1996Colors.canvas,
-                          border: Border.all(color: Dell1996Colors.frameInk, width: 1),
-                        ),
-                        child: const Icon(Icons.arrow_back, size: 20, color: Dell1996Colors.frameInk),
-                      ),
+              Dell1996TopBanner(
+                title: appBarTitle,
+                showBackButton: true,
+                trailingWidget: InkWell(
+                  onTap: _clearChatHistory,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: Dell1996Colors.canvas,
+                      border: Border.all(color: Dell1996Colors.frameInk, width: 1),
                     ),
-                    const SizedBox(width: Dell1996Spacing.md),
-                    Expanded(
-                      child: Text(
-                        appBarTitle,
-                        style: Dell1996Typography.heading2.copyWith(color: Dell1996Colors.canvas),
-                      ),
-                    ),
-                    InkWell(
-                      onTap: _clearChatHistory,
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: Dell1996Colors.canvas,
-                          border: Border.all(color: Dell1996Colors.frameInk, width: 1),
-                        ),
-                        child: const Icon(Icons.delete_sweep, size: 20, color: Dell1996Colors.frameInk),
-                      ),
-                    ),
-                  ],
+                    child: const Icon(Icons.delete_sweep, size: 20, color: Dell1996Colors.frameInk),
+                  ),
                 ),
               ),
               Expanded(

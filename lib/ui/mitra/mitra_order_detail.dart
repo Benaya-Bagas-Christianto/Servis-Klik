@@ -63,7 +63,8 @@ class _MitraOrderDetailState extends State<MitraOrderDetail> {
           child: Column(
             children: [
               Dell1996TopBanner(
-                title: 'ORDER DETAIL',
+                title: 'DETAIL ORDER',
+                showBackButton: true,
                 subtitle: widget.orderId,
               ),
               Expanded(

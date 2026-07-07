@@ -104,8 +104,9 @@ class _GaransiPageState extends State<GaransiPage> {
           child: Column(
             children: [
               const Dell1996TopBanner(
-                title: 'GARANSI DIGITAL',
-                subtitle: 'Portal Pengajuan Klaim',
+                title: 'KLAIM GARANSI',
+                subtitle: 'Pendaftaran garansi perbaikan',
+                showBackButton: true,
               ),
               Expanded(
                 child: StreamBuilder<QuerySnapshot>(

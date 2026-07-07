@@ -46,8 +46,9 @@ class LiveTrackingPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Dell1996TopBanner(
-                title: 'TRACKING SERVIS',
-                subtitle: 'Pantau status perbaikan perangkat Anda',
+                title: 'LIVE TRACKING',
+                subtitle: 'Pantau Status Perbaikan Anda',
+                showBackButton: true,
                 trailingWidget: Dell1996PhoneCallout(phoneNumber: '1-800-SERVIS'),
               ),
               Expanded(

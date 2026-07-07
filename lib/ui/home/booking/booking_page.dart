@@ -112,8 +112,9 @@ class _BookingPageState extends State<BookingPage> {
           child: Column(
             children: [
               const Dell1996TopBanner(
-                title: 'FORMULIR PEMESANAN SERVIS',
-                subtitle: 'Lengkapi data perangkat Anda di bawah ini',
+                title: 'FORM PEMESANAN',
+                subtitle: 'Isi detail masalah perangkat Anda',
+                showBackButton: true,
                 trailingWidget: Dell1996PhoneCallout(phoneNumber: '1-800-SERVIS'),
               ),
               Expanded(

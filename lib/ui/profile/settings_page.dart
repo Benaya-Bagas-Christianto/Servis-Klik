@@ -146,8 +146,9 @@ class _SettingsPageState extends State<SettingsPage> {
           child: Column(
             children: [
               const Dell1996TopBanner(
-                title: 'PENGATURAN',
+                title: 'PENGATURAN UMUM',
                 subtitle: 'Konfigurasi Sistem',
+                showBackButton: true,
               ),
               Expanded(
                 child: ListView(
