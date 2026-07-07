@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "821887691868",
+    "project_id": "project-mobprog-56024",
+    "storage_bucket": "project-mobprog-56024.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:821887691868:android:bce670ce9f5fefc7a24a99",
+        "android_client_info": {
+          "package_name": "com.example.project_moprog"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC_DRoi3b_He1NkCXvI_5Nj4Tq5F2JICnQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
