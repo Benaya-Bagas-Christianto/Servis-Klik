@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'mitra_documentation_page.dart';
+import '../../../theme/dell_1996_theme.dart';
+import '../../../widget/dell_1996_components.dart';
 
 class MitraOrderDetail extends StatefulWidget {
   final String orderId;
@@ -22,7 +24,6 @@ class MitraOrderDetail extends StatefulWidget {
 class _MitraOrderDetailState extends State<MitraOrderDetail> {
   String _selectedStatus = "Menunggu Pengecekan";
 
-  // 👇 Tambahkan controller untuk kalkulator biaya
   final TextEditingController _damageDetailController = TextEditingController();
   final TextEditingController _sparepartController = TextEditingController();
   final TextEditingController _jasaController = TextEditingController();
@@ -37,7 +38,6 @@ class _MitraOrderDetailState extends State<MitraOrderDetail> {
     "Siap Diambil / Diantar",
   ];
 
-  // --- FUNGSI HITUNG TOTAL BIAYA ---
   void _hitungTotal() {
     int biayaSparepart = int.tryParse(_sparepartController.text) ?? 0;
     int biayaJasa = int.tryParse(_jasaController.text) ?? 0;
@@ -56,233 +56,199 @@ class _MitraOrderDetailState extends State<MitraOrderDetail> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        title: Text(
-          "Order ${widget.orderId}",
-          style: const TextStyle(color: Colors.white, fontSize: 18),
-        ),
-        backgroundColor: Colors.teal,
-        iconTheme: const IconThemeData(color: Colors.white),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // --- SECTION 1: Info Pelanggan ---
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
+    return Dell1996PageFrame(
+      child: Scaffold(
+        backgroundColor: Dell1996Colors.canvas,
+        body: SafeArea(
+          child: Column(
+            children: [
+              Dell1996TopBanner(
+                title: 'ORDER DETAIL',
+                subtitle: widget.orderId,
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "Informasi Pelanggan",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.teal,
-                    ),
-                  ),
-                  const Divider(),
-                  _buildInfoRow("Nama", widget.customerName),
-                  _buildInfoRow("Perangkat", widget.device),
-                  _buildInfoRow("Keluhan", widget.initialIssue),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            // --- SECTION 2: Dokumentasi ---
-            const Text(
-              "Dokumentasi Foto",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            SizedBox(
-              width: double.infinity,
-              height: 55,
-              child: OutlinedButton.icon(
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.teal,
-                  side: const BorderSide(color: Colors.teal, width: 2),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          MitraDocumentationPage(orderId: widget.orderId),
-                    ),
-                  );
-                },
-                icon: const Icon(Icons.photo_camera),
-                label: const Text(
-                  "Buka Kamera & Unggah Bukti",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            // --- SECTION 3: Diagnosis & Kalkulator Biaya ---
-            const Text(
-              "Diagnosis & Estimasi Biaya",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  TextField(
-                    controller: _damageDetailController,
-                    maxLines: 2,
-                    decoration: InputDecoration(
-                      labelText: "Detail Kerusakan (Hasil Cek)",
-                      hintText: "Contoh: IC Power mati, perlu ganti.",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 15),
-                  TextField(
-                    controller: _sparepartController,
-                    keyboardType: TextInputType.number,
-                    onChanged: (_) => _hitungTotal(), // Hitung tiap kali ngetik
-                    decoration: InputDecoration(
-                      labelText: "Biaya Sparepart (Rp)",
-                      prefixIcon: const Icon(Icons.money),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 15),
-                  TextField(
-                    controller: _jasaController,
-                    keyboardType: TextInputType.number,
-                    onChanged: (_) => _hitungTotal(), // Hitung tiap kali ngetik
-                    decoration: InputDecoration(
-                      labelText: "Biaya Jasa Teknisi (Rp)",
-                      prefixIcon: const Icon(Icons.handyman),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                  ),
-                  const Divider(height: 30),
-
-                  // Tampilan total biaya dinamis
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(Dell1996Spacing.lg),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        "Total Estimasi:",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
+                      // --- SECTION 1: Info Pelanggan ---
+                      const Dell1996SectionEyebrow(
+                        title: '1. INFORMASI PELANGGAN',
+                        backgroundColor: Dell1996Colors.tintSky,
+                      ),
+                      const SizedBox(height: Dell1996Spacing.md),
+                      Container(
+                        padding: const EdgeInsets.all(Dell1996Spacing.md),
+                        decoration: BoxDecoration(
+                          color: Dell1996Colors.canvas,
+                          border: Border.all(color: Dell1996Colors.frameInk, width: 2),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildInfoRow("NAMA", widget.customerName),
+                            _buildInfoRow("PERANGKAT", widget.device),
+                            _buildInfoRow("KELUHAN", widget.initialIssue),
+                          ],
                         ),
                       ),
-                      Text(
-                        "Rp $_totalBiaya",
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                          color: Colors.teal,
+                      const SizedBox(height: Dell1996Spacing.xl),
+
+                      // --- SECTION 2: Dokumentasi ---
+                      const Dell1996SectionEyebrow(
+                        title: '2. BUKTI FOTO KERUSAKAN',
+                        backgroundColor: Dell1996Colors.tintPeach,
+                      ),
+                      const SizedBox(height: Dell1996Spacing.md),
+                      Dell1996ButtonPrimary(
+                        text: 'BUKA KAMERA & UNGGAH BUKTI',
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  MitraDocumentationPage(orderId: widget.orderId),
+                            ),
+                          );
+                        },
+                      ),
+                      const SizedBox(height: Dell1996Spacing.xl),
+
+                      // --- SECTION 3: Diagnosis & Kalkulator Biaya ---
+                      const Dell1996SectionEyebrow(
+                        title: '3. DIAGNOSIS & ESTIMASI BIAYA',
+                        backgroundColor: Dell1996Colors.tintLime,
+                      ),
+                      const SizedBox(height: Dell1996Spacing.md),
+                      Container(
+                        padding: const EdgeInsets.all(Dell1996Spacing.md),
+                        decoration: BoxDecoration(
+                          color: Dell1996Colors.canvas,
+                          border: Border.all(color: Dell1996Colors.frameInk, width: 2),
                         ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("DETAIL KERUSAKAN (HASIL CEK):", style: Dell1996Typography.uiLabel),
+                            const SizedBox(height: Dell1996Spacing.xs),
+                            Dell1996TextInput(
+                              controller: _damageDetailController,
+                              hintText: "Contoh: IC Power mati, perlu ganti.",
+                              maxLines: 3,
+                            ),
+                            const SizedBox(height: Dell1996Spacing.md),
+                            
+                            Text("BIAYA SPAREPART (RP):", style: Dell1996Typography.uiLabel),
+                            const SizedBox(height: Dell1996Spacing.xs),
+                            Dell1996TextInput(
+                              controller: _sparepartController,
+                              keyboardType: TextInputType.number,
+                              hintText: "0",
+                            ),
+                            const SizedBox(height: Dell1996Spacing.md),
+                            
+                            Text("BIAYA JASA TEKNISI (RP):", style: Dell1996Typography.uiLabel),
+                            const SizedBox(height: Dell1996Spacing.xs),
+                            Dell1996TextInput(
+                              controller: _jasaController,
+                              keyboardType: TextInputType.number,
+                              hintText: "0",
+                            ),
+                            const Divider(color: Dell1996Colors.frameInk, thickness: 1, height: 30),
+                            
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text("TOTAL ESTIMASI:", style: Dell1996Typography.uiLabel),
+                                Text(
+                                  "Rp $_totalBiaya",
+                                  style: Dell1996Typography.heading2.copyWith(color: Dell1996Colors.primary),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: Dell1996Spacing.xl),
+
+                      // --- SECTION 4: Update Status ---
+                      const Dell1996SectionEyebrow(
+                        title: '4. UPDATE STATUS SAAT INI',
+                        backgroundColor: Dell1996Colors.tintSteel,
+                      ),
+                      const SizedBox(height: Dell1996Spacing.md),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: Dell1996Spacing.md),
+                        decoration: BoxDecoration(
+                          color: Dell1996Colors.canvas,
+                          border: Border.all(color: Dell1996Colors.frameInk, width: 2),
+                        ),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<String>(
+                            isExpanded: true,
+                            value: _selectedStatus,
+                            icon: const Icon(Icons.arrow_drop_down, color: Dell1996Colors.frameInk),
+                            style: Dell1996Typography.body,
+                            dropdownColor: Dell1996Colors.canvas,
+                            items: _statusList.map((String status) {
+                              return DropdownMenuItem<String>(
+                                value: status,
+                                child: Text(status.toUpperCase()),
+                              );
+                            }).toList(),
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                _selectedStatus = newValue!;
+                              });
+                            },
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: Dell1996Spacing.section),
+
+                      // --- SECTION 5: Tombol Simpan ---
+                      Dell1996CtaBlockRed(
+                        text: 'SIMPAN & KIRIM KE PELANGGAN',
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              backgroundColor: Dell1996Colors.canvas,
+                              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                              title: Text("STATUS DIUPDATE", style: Dell1996Typography.heading2),
+                              content: Text(
+                                "Status menjadi: ${_selectedStatus.toUpperCase()}\nTotal Biaya: Rp $_totalBiaya",
+                                style: Dell1996Typography.body,
+                              ),
+                              actions: [
+                                Dell1996ButtonPrimary(
+                                  text: "TUTUP",
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                    Navigator.pop(context); // Kembali ke halaman sebelumnya
+                                  },
+                                ),
+                              ],
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            // --- SECTION 4: Update Status ---
-            const Text(
-              "Update Status Saat Ini",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.teal.withValues(alpha: 0.5)),
-              ),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  isExpanded: true,
-                  value: _selectedStatus,
-                  icon: const Icon(Icons.arrow_drop_down, color: Colors.teal),
-                  items: _statusList.map((String status) {
-                    return DropdownMenuItem<String>(
-                      value: status,
-                      child: Text(
-                        status,
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    );
-                  }).toList(),
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      _selectedStatus = newValue!;
-                    });
-                  },
                 ),
               ),
-            ),
-            const SizedBox(height: 30),
-
-            // --- SECTION 5: Tombol Simpan ---
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.teal,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        "Berhasil! Status diupdate menjadi: $_selectedStatus dan total biaya Rp $_totalBiaya",
-                      ),
-                    ),
-                  );
-                  Navigator.pop(context);
-                },
-                icon: const Icon(Icons.save, color: Colors.white),
-                label: const Text(
-                  "Simpan & Kirim ke Pelanggan",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
+              Container(
+                padding: const EdgeInsets.all(Dell1996Spacing.md),
+                color: Dell1996Colors.canvas,
+                child: Dell1996ButtonPrimary(
+                  text: 'KEMBALI',
+                  onPressed: () => Navigator.pop(context),
                 ),
               ),
-            ),
-            const SizedBox(height: 20),
-          ],
+              const Dell1996FooterBand(text: 'Simpan pembaruan status secara berkala.'),
+            ],
+          ),
         ),
       ),
     );
@@ -290,12 +256,18 @@ class _MitraOrderDetailState extends State<MitraOrderDetail> {
 
   Widget _buildInfoRow(String title, String value) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
+      padding: const EdgeInsets.only(bottom: Dell1996Spacing.sm),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(title, style: const TextStyle(color: Colors.grey)),
-          Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
+          Text(title, style: Dell1996Typography.body),
+          Expanded(
+            child: Text(
+              value,
+              style: Dell1996Typography.body.copyWith(fontWeight: FontWeight.bold),
+              textAlign: TextAlign.right,
+            ),
+          ),
         ],
       ),
     );

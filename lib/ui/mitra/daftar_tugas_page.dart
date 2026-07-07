@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:intl/intl.dart';
-import '../home/home_page.dart'; // Digunakan untuk mengakses _showUpdateStatusDialog jika perlu, tapi karena itu ada di state HomePage, kita bisa mengatasinya.
-// Karena method _showUpdateStatusDialog ada di _HomePageState, kita akan buat dialog sederhana atau biarkan saja read-only/bisa di tap di sini.
+import '../../../theme/dell_1996_theme.dart';
+import '../../../widget/dell_1996_components.dart';
 
 class DaftarTugasPage extends StatelessWidget {
   const DaftarTugasPage({super.key});
@@ -10,36 +9,55 @@ class DaftarTugasPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 4, // 4 Tab Status
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text(
-            'Daftar Semua Tugas',
-            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+      length: 4,
+      child: Dell1996PageFrame(
+        child: Scaffold(
+          backgroundColor: Dell1996Colors.canvas,
+          body: SafeArea(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Dell1996TopBanner(
+                  title: 'DAFTAR TUGAS',
+                  subtitle: 'Manajemen perbaikan perangkat pelanggan',
+                ),
+                Container(
+                  decoration: const BoxDecoration(
+                    color: Dell1996Colors.canvas,
+                    border: Border(bottom: BorderSide(color: Dell1996Colors.frameInk, width: 2)),
+                  ),
+                  child: TabBar(
+                    isScrollable: true,
+                    indicator: BoxDecoration(
+                      color: Dell1996Colors.tintSky,
+                      border: Border.all(color: Dell1996Colors.frameInk, width: 1),
+                    ),
+                    indicatorPadding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+                    labelColor: Dell1996Colors.ink,
+                    unselectedLabelColor: Dell1996Colors.ink,
+                    labelStyle: Dell1996Typography.uiLabel,
+                    unselectedLabelStyle: Dell1996Typography.uiLabel,
+                    tabs: const [
+                      Tab(text: "MENUNGGU"),
+                      Tab(text: "PROSES"),
+                      Tab(text: "MENUNGGU BAYAR"),
+                      Tab(text: "SELESAI"),
+                    ],
+                  ),
+                ),
+                const Expanded(
+                  child: TabBarView(
+                    children: [
+                      _ListTugas(statusFilter: 'Menunggu Teknisi'),
+                      _ListTugas(statusFilter: 'Proses Perbaikan'),
+                      _ListTugas(statusFilter: 'Menunggu Pembayaran'),
+                      _ListTugas(statusFilter: 'Selesai'),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
-          backgroundColor: Colors.blueAccent,
-          iconTheme: const IconThemeData(color: Colors.white),
-          bottom: const TabBar(
-            isScrollable: true,
-            labelColor: Colors.white,
-            unselectedLabelColor: Colors.white70,
-            indicatorColor: Colors.white,
-            tabs: [
-              Tab(text: "Menunggu"),
-              Tab(text: "Proses"),
-              Tab(text: "Menunggu Bayar"),
-              Tab(text: "Selesai"),
-            ],
-          ),
-        ),
-        backgroundColor: Colors.grey[100],
-        body: const TabBarView(
-          children: [
-            _ListTugas(statusFilter: 'Menunggu Teknisi'),
-            _ListTugas(statusFilter: 'Proses Perbaikan'),
-            _ListTugas(statusFilter: 'Menunggu Pembayaran'),
-            _ListTugas(statusFilter: 'Selesai'),
-          ],
         ),
       ),
     );
@@ -66,11 +84,11 @@ class _ListTugas extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.inbox_outlined, size: 60, color: Colors.grey[400]),
-                const SizedBox(height: 10),
+                const Icon(Icons.inbox, size: 64, color: Dell1996Colors.frameInk),
+                const SizedBox(height: Dell1996Spacing.sm),
                 Text(
                   "Tidak ada tugas di tahap ini.",
-                  style: TextStyle(color: Colors.grey[600]),
+                  style: Dell1996Typography.body,
                 ),
               ],
             ),
@@ -79,9 +97,6 @@ class _ListTugas extends StatelessWidget {
 
         var orders = snapshot.data!.docs.toList();
 
-        // 👈 SORTING BERDASARKAN WAKTU TERBARU (Descending)
-        // Kita lakukan sorting di level Dart untuk menghindari error "Missing Index" di Firebase
-        // karena kita sudah menggunakan filter .where('status') sebelumnya.
         orders.sort((a, b) {
           var dataA = a.data() as Map<String, dynamic>;
           var dataB = b.data() as Map<String, dynamic>;
@@ -92,76 +107,93 @@ class _ListTugas extends StatelessWidget {
           if (timeA == null) return 1;
           if (timeB == null) return -1;
           
-          return timeB.compareTo(timeA); // Waktu terbaru di atas
+          return timeB.compareTo(timeA);
         });
 
         return ListView.builder(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(Dell1996Spacing.lg),
           itemCount: orders.length,
           itemBuilder: (context, index) {
             var data = orders[index].data() as Map<String, dynamic>;
             
-            Color statusColor;
+            Color tintColor;
             switch (statusFilter) {
               case 'Menunggu Teknisi':
-                statusColor = Colors.orange;
+                tintColor = Dell1996Colors.tintPeach;
                 break;
               case 'Proses Perbaikan':
-                statusColor = Colors.blue;
+                tintColor = Dell1996Colors.tintSky;
                 break;
               case 'Selesai':
-                statusColor = Colors.green;
+                tintColor = Dell1996Colors.tintLime;
                 break;
               default:
-                statusColor = Colors.purple;
+                tintColor = Dell1996Colors.tintSalmon;
             }
 
-            return Card(
-              margin: const EdgeInsets.only(bottom: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              child: ListTile(
-                contentPadding: const EdgeInsets.all(16),
-                leading: CircleAvatar(
-                  backgroundColor: statusColor.withValues(alpha: 0.2),
-                  child: Icon(Icons.computer, color: statusColor),
-                ),
-                title: Text(
-                  data['perangkat'] ?? 'Perangkat',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 5),
-                    if (data['kategori'] != null && data['kategori'].toString().trim().isNotEmpty) ...[
-                      Text("Kategori: ${data['kategori']}"),
-                      const SizedBox(height: 5),
-                    ],
-                    if (data['keluhan'] != null && data['keluhan'].toString().trim().isNotEmpty) ...[
-                      Text("Keluhan: ${data['keluhan']}"),
-                      const SizedBox(height: 5),
-                    ],
-                    if (data['alamat'] != null && data['alamat'].toString().trim().isNotEmpty) ...[
-                      Text("Alamat: ${data['alamat']}"),
-                      const SizedBox(height: 5),
-                    ],
-                    Text(
-                      "Pelanggan: ${data['nama_user'] ?? 'Anonim'}",
-                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+            return Container(
+              margin: const EdgeInsets.only(bottom: Dell1996Spacing.md),
+              decoration: BoxDecoration(
+                color: tintColor,
+                border: Border.all(color: Dell1996Colors.frameInk, width: 1),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(Dell1996Spacing.md),
+                    decoration: const BoxDecoration(
+                      color: Dell1996Colors.canvas,
+                      border: Border(bottom: BorderSide(color: Dell1996Colors.frameInk, width: 1)),
                     ),
-                  ],
-                ),
-                trailing: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  decoration: BoxDecoration(
-                    color: statusColor.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            (data['perangkat'] ?? 'PERANGKAT').toString().toUpperCase(),
+                            style: Dell1996Typography.heading3,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                          color: Dell1996Colors.frameInk,
+                          child: Text(
+                            statusFilter.toUpperCase(),
+                            style: Dell1996Typography.uiLabel.copyWith(color: Dell1996Colors.canvas),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  child: Text(
-                    statusFilter,
-                    style: TextStyle(color: statusColor, fontSize: 10, fontWeight: FontWeight.bold),
+                  Padding(
+                    padding: const EdgeInsets.all(Dell1996Spacing.md),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (data['kategori'] != null && data['kategori'].toString().trim().isNotEmpty) ...[
+                          Text("KATEGORI: ${(data['kategori']).toString().toUpperCase()}", style: Dell1996Typography.uiLabel),
+                          const SizedBox(height: Dell1996Spacing.xs),
+                        ],
+                        if (data['keluhan'] != null && data['keluhan'].toString().trim().isNotEmpty) ...[
+                          Text("KELUHAN: ${data['keluhan']}", style: Dell1996Typography.body),
+                          const SizedBox(height: Dell1996Spacing.xs),
+                        ],
+                        if (data['alamat'] != null && data['alamat'].toString().trim().isNotEmpty) ...[
+                          Text("ALAMAT: ${data['alamat']}", style: Dell1996Typography.body),
+                          const SizedBox(height: Dell1996Spacing.xs),
+                        ],
+                        const Divider(color: Dell1996Colors.frameInk, thickness: 1, height: 20),
+                        Text(
+                          "PELANGGAN: ${(data['nama_user'] ?? 'Anonim').toString().toUpperCase()}",
+                          style: Dell1996Typography.uiLabel,
+                        ),
+                      ],
+                    ),
                   ),
-                ),
+                ],
               ),
             );
           },

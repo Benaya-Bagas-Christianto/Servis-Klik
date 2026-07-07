@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../../theme/dell_1996_theme.dart';
+import '../../../widget/dell_1996_components.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -11,7 +13,7 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   final User? currentUser = FirebaseAuth.instance.currentUser;
-  String _namaUser = "Memuat data...";
+  String _namaUser = "MEMUAT DATA...";
 
   @override
   void initState() {
@@ -25,7 +27,7 @@ class _SettingsPageState extends State<SettingsPage> {
       var doc = await FirebaseFirestore.instance.collection('users').doc(currentUser!.uid).get();
       if (doc.exists && mounted) {
         setState(() {
-          _namaUser = doc.data()?['nama'] ?? 'Pengguna';
+          _namaUser = (doc.data()?['nama'] ?? 'Pengguna').toString().toUpperCase();
         });
       }
     }
@@ -41,20 +43,25 @@ class _SettingsPageState extends State<SettingsPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: const Text("Ganti Nama", style: TextStyle(fontWeight: FontWeight.bold)),
-          content: TextField(
-            controller: namaController,
-            decoration: InputDecoration(
-              labelText: "Nama Lengkap Baru",
-              prefixIcon: const Icon(Icons.person, color: Colors.blueAccent),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-            ),
+          backgroundColor: Dell1996Colors.canvas,
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+          title: Text("GANTI NAMA", style: Dell1996Typography.heading2),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("NAMA LENGKAP BARU:", style: Dell1996Typography.uiLabel),
+              const SizedBox(height: Dell1996Spacing.xs),
+              Dell1996TextInput(controller: namaController),
+            ],
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: const Text("Batal")),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.blueAccent),
+            Dell1996ButtonPrimary(
+              text: "BATAL",
+              onPressed: () => Navigator.pop(context),
+            ),
+            Dell1996ButtonPrimary(
+              text: "SIMPAN",
               onPressed: () async {
                 String namaBaru = namaController.text.trim();
                 if (namaBaru.isEmpty) return;
@@ -65,17 +72,19 @@ class _SettingsPageState extends State<SettingsPage> {
                 });
 
                 setState(() {
-                  _namaUser = namaBaru; // Update tampilan di layar langsung
+                  _namaUser = namaBaru.toUpperCase(); // Update tampilan di layar langsung
                 });
 
                 if (context.mounted) {
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Nama berhasil diperbarui!"), backgroundColor: Colors.green),
+                    SnackBar(
+                      content: Text("NAMA BERHASIL DIPERBARUI!", style: Dell1996Typography.body.copyWith(color: Dell1996Colors.canvas)),
+                      backgroundColor: Dell1996Colors.primary,
+                    ),
                   );
                 }
               },
-              child: const Text("Simpan", style: TextStyle(color: Colors.white)),
             ),
           ],
         );
@@ -91,27 +100,36 @@ class _SettingsPageState extends State<SettingsPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: const Text("Ganti Password", style: TextStyle(fontWeight: FontWeight.bold)),
-          content: Text("Kirimkan tautan untuk mengganti password ke email:\n${currentUser?.email}?"),
+          backgroundColor: Dell1996Colors.canvas,
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+          title: Text("GANTI PASSWORD", style: Dell1996Typography.heading2),
+          content: Text(
+            "Kirimkan tautan untuk mengganti password ke email:\n${currentUser?.email?.toUpperCase()}?",
+            style: Dell1996Typography.body,
+          ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: const Text("Batal")),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+            Dell1996ButtonPrimary(
+              text: "BATAL",
+              onPressed: () => Navigator.pop(context),
+            ),
+            Dell1996ButtonPrimary(
+              text: "YA, KIRIM EMAIL",
               onPressed: () async {
                 try {
                   await FirebaseAuth.instance.sendPasswordResetEmail(email: currentUser!.email!);
                   if (context.mounted) {
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Tautan ganti password telah dikirim ke email Anda!"), backgroundColor: Colors.green),
+                      SnackBar(
+                        content: Text("TAUTAN TELAH DIKIRIM KE EMAIL ANDA!", style: Dell1996Typography.body.copyWith(color: Dell1996Colors.canvas)),
+                        backgroundColor: Dell1996Colors.primary,
+                      ),
                     );
                   }
                 } catch (e) {
                   debugPrint("Error: $e");
                 }
               },
-              child: const Text("Ya, Kirim Email", style: TextStyle(color: Colors.white)),
             ),
           ],
         );
@@ -121,82 +139,126 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Pengaturan", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.blueAccent,
-        iconTheme: const IconThemeData(color: Colors.white),
-      ),
-      backgroundColor: Colors.grey[100],
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          // --- SECTION: AKUN SAAT INI ---
-          const Padding(
-            padding: EdgeInsets.only(left: 8, bottom: 8),
-            child: Text("Akun Saat Ini", style: TextStyle(color: Colors.blueAccent, fontWeight: FontWeight.bold, fontSize: 13)),
-          ),
-          Card(
-            elevation: 0,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            child: ListTile(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              leading: const CircleAvatar(radius: 25, backgroundColor: Colors.blueAccent, child: Icon(Icons.person, color: Colors.white, size: 30)),
-              title: Text(_namaUser, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-              subtitle: Text(currentUser?.email ?? "Email tidak ditemukan", style: const TextStyle(fontSize: 13)),
-              // Ikon pensil (edit) dihilangkan sesuai permintaan
-            ),
-          ),
-          const SizedBox(height: 20),
+    return Dell1996PageFrame(
+      child: Scaffold(
+        backgroundColor: Dell1996Colors.canvas,
+        body: SafeArea(
+          child: Column(
+            children: [
+              const Dell1996TopBanner(
+                title: 'PENGATURAN',
+                subtitle: 'Konfigurasi Sistem',
+              ),
+              Expanded(
+                child: ListView(
+                  padding: const EdgeInsets.all(Dell1996Spacing.lg),
+                  children: [
+                    // --- SECTION: AKUN SAAT INI ---
+                    const Dell1996SectionEyebrow(
+                      title: 'AKUN SAAT INI',
+                      backgroundColor: Dell1996Colors.tintSky,
+                    ),
+                    const SizedBox(height: Dell1996Spacing.sm),
+                    Container(
+                      padding: const EdgeInsets.all(Dell1996Spacing.md),
+                      decoration: BoxDecoration(
+                        color: Dell1996Colors.canvas,
+                        border: Border.all(color: Dell1996Colors.frameInk, width: 2),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 50,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              color: Dell1996Colors.canvas,
+                              border: Border.all(color: Dell1996Colors.frameInk, width: 2),
+                            ),
+                            child: const Icon(Icons.person, size: 30, color: Dell1996Colors.frameInk),
+                          ),
+                          const SizedBox(width: Dell1996Spacing.md),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(_namaUser, style: Dell1996Typography.heading3),
+                                const SizedBox(height: Dell1996Spacing.xs),
+                                Text((currentUser?.email ?? "EMAIL TIDAK DITEMUKAN").toUpperCase(), style: Dell1996Typography.uiLabel),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: Dell1996Spacing.section),
 
-          // --- SECTION: UMUM ---
-          const Padding(
-            padding: EdgeInsets.only(left: 8, bottom: 8),
-            child: Text("Umum", style: TextStyle(color: Colors.blueAccent, fontWeight: FontWeight.bold, fontSize: 13)),
-          ),
-          Card(
-            elevation: 0,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            child: Column(
-              children: [
-                // 👇 Notifikasi & Bahasa dihapus, diganti menjadi menu Ganti Nama dan Ganti Password
-                _buildListTile(Icons.badge_outlined, "Ganti Nama", onTap: _showEditProfileDialog),
-                const Divider(height: 1, indent: 50),
-                _buildListTile(Icons.lock_outline, "Ganti Password", onTap: _resetPassword),
-              ],
-            ),
-          ),
-          const SizedBox(height: 20),
+                    // --- SECTION: UMUM ---
+                    const Dell1996SectionEyebrow(
+                      title: 'UMUM',
+                      backgroundColor: Dell1996Colors.tintPeach,
+                    ),
+                    const SizedBox(height: Dell1996Spacing.sm),
+                    _buildListTile(Icons.badge_outlined, "GANTI NAMA", onTap: _showEditProfileDialog),
+                    _buildListTile(Icons.lock_outline, "GANTI PASSWORD", onTap: _resetPassword),
+                    const SizedBox(height: Dell1996Spacing.section),
 
-          // --- SECTION: INFORMASI ---
-          const Padding(
-            padding: EdgeInsets.only(left: 8, bottom: 8),
-            child: Text("Informasi", style: TextStyle(color: Colors.blueAccent, fontWeight: FontWeight.bold, fontSize: 13)),
+                    // --- SECTION: INFORMASI ---
+                    const Dell1996SectionEyebrow(
+                      title: 'INFORMASI',
+                      backgroundColor: Dell1996Colors.tintLime,
+                    ),
+                    const SizedBox(height: Dell1996Spacing.sm),
+                    _buildListTile(Icons.privacy_tip_outlined, "KEBIJAKAN PRIVASI"),
+                    _buildListTile(Icons.info_outline, "TENTANG APLIKASI", subtitle: "VERSI 1.0.0"),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.all(Dell1996Spacing.md),
+                color: Dell1996Colors.canvas,
+                child: Dell1996ButtonPrimary(
+                  text: 'KEMBALI',
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ),
+            ],
           ),
-          Card(
-            elevation: 0,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            child: Column(
-              children: [
-                _buildListTile(Icons.privacy_tip_outlined, "Kebijakan Privasi"),
-                const Divider(height: 1, indent: 50),
-                _buildListTile(Icons.info_outline, "Tentang Aplikasi", subtitle: "Versi 1.0.0"),
-              ],
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
 
-  // Widget pembantu untuk merapikan desain tombol
   Widget _buildListTile(IconData icon, String title, {String? subtitle, VoidCallback? onTap}) {
-    return ListTile(
-      leading: Icon(icon, color: Colors.grey[700]),
-      title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-      subtitle: subtitle != null ? Text(subtitle, style: const TextStyle(fontSize: 12)) : null,
-      trailing: const Icon(Icons.chevron_right, color: Colors.grey),
+    return InkWell(
       onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: Dell1996Spacing.xs),
+        padding: const EdgeInsets.all(Dell1996Spacing.md),
+        decoration: BoxDecoration(
+          color: Dell1996Colors.canvas,
+          border: Border.all(color: Dell1996Colors.frameInk, width: 2),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: Dell1996Colors.frameInk),
+            const SizedBox(width: Dell1996Spacing.md),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: Dell1996Typography.body.copyWith(fontWeight: FontWeight.bold)),
+                  if (subtitle != null) ...[
+                    const SizedBox(height: Dell1996Spacing.xs),
+                    Text(subtitle, style: Dell1996Typography.uiLabel),
+                  ],
+                ],
+              ),
+            ),
+            if (onTap != null)
+              const Icon(Icons.arrow_forward_ios, size: 16, color: Dell1996Colors.frameInk),
+          ],
+        ),
+      ),
     );
   }
 }

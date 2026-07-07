@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../../theme/dell_1996_theme.dart';
+import '../../../widget/dell_1996_components.dart';
 
 class ChatPage extends StatefulWidget {
   final String customerUid;
@@ -21,7 +23,7 @@ class _ChatPageState extends State<ChatPage> {
   final TextEditingController _chatController = TextEditingController();
   final User? currentUser = FirebaseAuth.instance.currentUser;
 
-  String _namaSaya = "Pengguna";
+  String _namaSaya = "PENGGUNA";
   String _roleSaya = "user";
 
   @override
@@ -38,7 +40,7 @@ class _ChatPageState extends State<ChatPage> {
           .get();
       if (doc.exists && mounted) {
         setState(() {
-          _namaSaya = doc.data()?['nama'] ?? 'Pengguna';
+          _namaSaya = (doc.data()?['nama'] ?? 'Pengguna').toString().toUpperCase();
           _roleSaya = doc.data()?['role'] ?? 'user';
         });
       }
@@ -73,16 +75,18 @@ class _ChatPageState extends State<ChatPage> {
     bool? confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("Hapus Pesan"),
-        content: const Text("Apakah Anda yakin ingin menghapus pesan ini?"),
+        backgroundColor: Dell1996Colors.canvas,
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+        title: Text("HAPUS PESAN", style: Dell1996Typography.heading2),
+        content: Text("Apakah Anda yakin ingin menghapus pesan ini?", style: Dell1996Typography.body),
         actions: [
-          TextButton(
+          Dell1996ButtonPrimary(
+            text: "BATAL",
             onPressed: () => Navigator.pop(context, false),
-            child: const Text("Batal"),
           ),
-          TextButton(
+          Dell1996ButtonPrimary(
+            text: "HAPUS",
             onPressed: () => Navigator.pop(context, true),
-            child: const Text("Hapus", style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -106,16 +110,21 @@ class _ChatPageState extends State<ChatPage> {
     bool? confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("Hapus Semua Chat"),
-        content: const Text("Apakah Anda yakin ingin menghapus seluruh riwayat chat ini? Data yang dihapus tidak dapat dikembalikan."),
+        backgroundColor: Dell1996Colors.canvas,
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+        title: Text("HAPUS SEMUA CHAT", style: Dell1996Typography.heading2),
+        content: Text(
+          "Apakah Anda yakin ingin menghapus seluruh riwayat chat ini? Data yang dihapus tidak dapat dikembalikan.",
+          style: Dell1996Typography.body,
+        ),
         actions: [
-          TextButton(
+          Dell1996ButtonPrimary(
+            text: "BATAL",
             onPressed: () => Navigator.pop(context, false),
-            child: const Text("Batal"),
           ),
-          TextButton(
+          Dell1996ButtonPrimary(
+            text: "HAPUS",
             onPressed: () => Navigator.pop(context, true),
-            child: const Text("Hapus", style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -138,7 +147,10 @@ class _ChatPageState extends State<ChatPage> {
         
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Riwayat chat berhasil dihapus.")),
+            SnackBar(
+              content: Text("RIWAYAT CHAT BERHASIL DIHAPUS.", style: Dell1996Typography.body.copyWith(color: Dell1996Colors.canvas)),
+              backgroundColor: Dell1996Colors.primary,
+            ),
           );
         }
       } catch (e) {
@@ -151,126 +163,150 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     // Tampilan judul atas menyesuaikan siapa yang login
     String appBarTitle = _roleSaya == 'mitra'
-        ? "Chat: ${widget.customerName}"
-        : "Live Chat Teknisi";
+        ? "CHAT: ${widget.customerName.toUpperCase()}"
+        : "LIVE CHAT TEKNISI";
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          appBarTitle,
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        backgroundColor: _roleSaya == 'mitra'
-            ? Colors.indigo
-            : Colors.blueAccent,
-        iconTheme: const IconThemeData(color: Colors.white),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.delete_sweep),
-            tooltip: 'Hapus Semua Chat',
-            onPressed: _clearChatHistory,
-          ),
-        ],
-      ),
-      backgroundColor: Colors.grey[100],
-      body: Column(
-        children: [
-          Expanded(
-            child: StreamBuilder<QuerySnapshot>(
-              // 👇 Menarik data HANYA dari ruang obrolan milik pelanggan ini
-              stream: FirebaseFirestore.instance
-                  .collection('ruang_chat')
-                  .doc(widget.customerUid)
-                  .collection('pesan')
-                  .orderBy('timestamp', descending: true)
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-
-                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                  return Center(
-                    child: Text(
-                      _roleSaya == 'mitra'
-                          ? "Belum ada pesan dari pelanggan ini."
-                          : "Sapa teknisi kami sekarang!",
-                      style: const TextStyle(color: Colors.grey),
+    return Dell1996PageFrame(
+      child: Scaffold(
+        backgroundColor: Dell1996Colors.canvas,
+        body: SafeArea(
+          child: Column(
+            children: [
+              Container(
+                color: Dell1996Colors.primary,
+                padding: const EdgeInsets.symmetric(vertical: Dell1996Spacing.sm, horizontal: Dell1996Spacing.md),
+                child: Row(
+                  children: [
+                    InkWell(
+                      onTap: () => Navigator.pop(context),
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: Dell1996Colors.canvas,
+                          border: Border.all(color: Dell1996Colors.frameInk, width: 1),
+                        ),
+                        child: const Icon(Icons.arrow_back, size: 20, color: Dell1996Colors.frameInk),
+                      ),
                     ),
-                  );
-                }
-
-                var messages = snapshot.data!.docs;
-
-                return ListView.builder(
-                  reverse: true,
-                  padding: const EdgeInsets.all(16),
-                  itemCount: messages.length,
-                  itemBuilder: (context, index) {
-                    var data = messages[index].data() as Map<String, dynamic>;
-                    String docId = messages[index].id;
-                    bool isMe = data['senderEmail'] == currentUser?.email;
-                    bool isTeknisi = data['role'] == 'mitra';
-
-                    return _buildChatBubble(
-                      data['text'] ?? '',
-                      isMe,
-                      data['senderName'] ?? 'Anonim',
-                      isTeknisi,
-                      docId,
+                    const SizedBox(width: Dell1996Spacing.md),
+                    Expanded(
+                      child: Text(
+                        appBarTitle,
+                        style: Dell1996Typography.heading2.copyWith(color: Dell1996Colors.canvas),
+                      ),
+                    ),
+                    InkWell(
+                      onTap: _clearChatHistory,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: Dell1996Colors.canvas,
+                          border: Border.all(color: Dell1996Colors.frameInk, width: 1),
+                        ),
+                        child: const Icon(Icons.delete_sweep, size: 20, color: Dell1996Colors.frameInk),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: StreamBuilder<QuerySnapshot>(
+                  // 👇 Menarik data HANYA dari ruang obrolan milik pelanggan ini
+                  stream: FirebaseFirestore.instance
+                      .collection('ruang_chat')
+                      .doc(widget.customerUid)
+                      .collection('pesan')
+                      .orderBy('timestamp', descending: true)
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator(color: Dell1996Colors.primary));
+                    }
+          
+                    if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                      return Center(
+                        child: Container(
+                          padding: const EdgeInsets.all(Dell1996Spacing.lg),
+                          decoration: BoxDecoration(
+                            color: Dell1996Colors.canvas,
+                            border: Border.all(color: Dell1996Colors.frameInk, width: 2),
+                          ),
+                          child: Text(
+                            _roleSaya == 'mitra'
+                                ? "BELUM ADA PESAN DARI PELANGGAN INI."
+                                : "SAPA TEKNISI KAMI SEKARANG!",
+                            style: Dell1996Typography.body,
+                          ),
+                        ),
+                      );
+                    }
+          
+                    var messages = snapshot.data!.docs;
+          
+                    return ListView.builder(
+                      reverse: true,
+                      padding: const EdgeInsets.all(Dell1996Spacing.lg),
+                      itemCount: messages.length,
+                      itemBuilder: (context, index) {
+                        var data = messages[index].data() as Map<String, dynamic>;
+                        String docId = messages[index].id;
+                        bool isMe = data['senderEmail'] == currentUser?.email;
+                        bool isTeknisi = data['role'] == 'mitra';
+          
+                        return _buildChatBubble(
+                          data['text'] ?? '',
+                          isMe,
+                          (data['senderName'] ?? 'Anonim').toString().toUpperCase(),
+                          isTeknisi,
+                          docId,
+                        );
+                      },
                     );
                   },
-                );
-              },
-            ),
+                ),
+              ),
+              _buildInputArea(),
+            ],
           ),
-          _buildInputArea(),
-        ],
+        ),
       ),
     );
   }
 
   Widget _buildInputArea() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      padding: const EdgeInsets.all(Dell1996Spacing.md),
       decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: Colors.black12)),
+        color: Dell1996Colors.tintSteel,
+        border: Border(top: BorderSide(color: Dell1996Colors.frameInk, width: 2)),
       ),
       child: Row(
         children: [
           Expanded(
-            child: TextField(
+            child: Dell1996TextInput(
               controller: _chatController,
-              minLines: 1,
-              maxLines: 4, // Akan membesar ke bawah maksimal 4 baris sebelum bisa di-scroll
-              keyboardType: TextInputType.multiline,
-              decoration: InputDecoration(
-                hintText: "Ketik pesan...",
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(20),
-                  borderSide: BorderSide.none,
-                ),
-                filled: true,
-                fillColor: Colors.grey[200],
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 10,
-                ),
-              ),
+              maxLines: 1, // Kita set 1 baris saja agar sederhana seperti UI 90an
             ),
           ),
-          const SizedBox(width: 8),
-          CircleAvatar(
-            backgroundColor: _roleSaya == 'mitra'
-                ? Colors.indigo
-                : Colors.blueAccent,
-            child: IconButton(
-              icon: const Icon(Icons.send, color: Colors.white, size: 20),
-              onPressed: _sendMessage,
+          const SizedBox(width: Dell1996Spacing.sm),
+          InkWell(
+            onTap: _sendMessage,
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+              decoration: BoxDecoration(
+                color: Dell1996Colors.primary,
+                border: Border.all(color: Dell1996Colors.frameInk, width: 2),
+                boxShadow: const [
+                  BoxShadow(color: Dell1996Colors.frameInk, offset: Offset(2, 2)),
+                ],
+              ),
+              child: Text(
+                "KIRIM",
+                style: Dell1996Typography.body.copyWith(
+                  color: Dell1996Colors.canvas,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ),
         ],
@@ -290,60 +326,40 @@ class _ChatPageState extends State<ChatPage> {
       child: Align(
         alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
         child: Container(
-          margin: const EdgeInsets.only(bottom: 12),
+          margin: const EdgeInsets.only(bottom: Dell1996Spacing.md),
           constraints: BoxConstraints(
             maxWidth: MediaQuery.of(context).size.width * 0.75,
           ),
-        child: Column(
-          crossAxisAlignment: isMe
-              ? CrossAxisAlignment.end
-              : CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(bottom: 4, left: 4, right: 4),
-              child: Text(
-                isTeknisi ? "🔧 $senderName (Teknisi)" : senderName,
-                style: TextStyle(
-                  fontSize: 11,
-                  color: isTeknisi ? Colors.indigo : Colors.grey[600],
-                  fontWeight: isTeknisi ? FontWeight.bold : FontWeight.normal,
+          child: Column(
+            crossAxisAlignment: isMe
+                ? CrossAxisAlignment.end
+                : CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(bottom: Dell1996Spacing.xs),
+                child: Text(
+                  isTeknisi ? "🔧 $senderName (TEKNISI)" : senderName,
+                  style: Dell1996Typography.uiLabel,
                 ),
               ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(
-                color: isMe
-                    ? (_roleSaya == 'mitra' ? Colors.indigo : Colors.blueAccent)
-                    : Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: const Radius.circular(16),
-                  topRight: const Radius.circular(16),
-                  bottomLeft: isMe
-                      ? const Radius.circular(16)
-                      : const Radius.circular(4),
-                  bottomRight: isMe
-                      ? const Radius.circular(4)
-                      : const Radius.circular(16),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: Dell1996Spacing.md, vertical: Dell1996Spacing.sm),
+                decoration: BoxDecoration(
+                  color: isMe
+                      ? (_roleSaya == 'mitra' ? Dell1996Colors.tintSky : Dell1996Colors.tintLime)
+                      : Dell1996Colors.canvas,
+                  border: Border.all(color: Dell1996Colors.frameInk, width: 2),
+                  boxShadow: const [
+                    BoxShadow(color: Dell1996Colors.frameInk, offset: Offset(2, 2)),
+                  ],
                 ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
-                    blurRadius: 5,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Text(
-                text,
-                style: TextStyle(
-                  color: isMe ? Colors.white : Colors.black87,
-                  fontSize: 14,
+                child: Text(
+                  text,
+                  style: Dell1996Typography.body,
                 ),
               ),
-            ),
-          ],
-        ),
+            ],
+          ),
         ),
       ),
     );

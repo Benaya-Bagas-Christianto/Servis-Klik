@@ -68,6 +68,7 @@ class _HomePageDell1996State extends State<HomePageDell1996> {
             Dell1996TopBanner(
               title: 'SELAMAT DATANG, $nama! 👋',
               subtitle: 'Siap menyelesaikan servis laptop hari ini?',
+              trailingWidget: const Dell1996PhoneCallout(phoneNumber: '1-800-SERVIS'),
             ),
 
             const SizedBox(height: Dell1996Spacing.lg),
@@ -330,6 +331,7 @@ class _HomePageDell1996State extends State<HomePageDell1996> {
             Dell1996TopBanner(
               title: 'HALO, $nama! 👋',
               subtitle: 'Laptopmu kenapa hari ini?',
+              trailingWidget: const Dell1996PhoneCallout(phoneNumber: '1-800-SERVIS'),
             ),
 
             const SizedBox(height: Dell1996Spacing.lg),

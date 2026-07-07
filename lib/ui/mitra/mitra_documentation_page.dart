@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../theme/dell_1996_theme.dart';
+import '../../../widget/dell_1996_components.dart';
 
 class MitraDocumentationPage extends StatefulWidget {
   final String orderId;
@@ -14,112 +16,115 @@ class _MitraDocumentationPageState extends State<MitraDocumentationPage> {
   bool _fotoRusakUploaded = false;
   bool _fotoSelesaiUploaded = false;
 
-  // Status loading untuk masing-masing foto
   bool _isLoading1 = false;
   bool _isLoading2 = false;
   bool _isLoading3 = false;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        title: const Text(
-          "Dokumentasi Visual",
-          style: TextStyle(color: Colors.white, fontSize: 18),
-        ),
-        backgroundColor: Colors.teal,
-        iconTheme: const IconThemeData(color: Colors.white),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "Order: ${widget.orderId}",
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.teal,
+    return Dell1996PageFrame(
+      child: Scaffold(
+        backgroundColor: Dell1996Colors.canvas,
+        body: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Dell1996TopBanner(
+                title: 'DOKUMENTASI FOTO',
+                subtitle: widget.orderId,
               ),
-            ),
-            const SizedBox(height: 5),
-            const Text(
-              "Unggah foto untuk bukti transparansi ke pelanggan.",
-              style: TextStyle(color: Colors.grey),
-            ),
-            const SizedBox(height: 25),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(Dell1996Spacing.lg),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "UNGGAH FOTO SEBAGAI BUKTI UNTUK PELANGGAN.",
+                        style: Dell1996Typography.uiLabel,
+                      ),
+                      const SizedBox(height: Dell1996Spacing.xl),
 
-            const Text(
-              "1. Kondisi Awal Diterima",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            ),
-            const SizedBox(height: 10),
-            _buildPhotoBox(
-              isUploaded: _fotoAwalUploaded,
-              isLoading: _isLoading1,
-              title: "Ambil Foto Kondisi Awal",
-              onTap: () => _simulasiBukaKamera(1),
-            ),
-            const SizedBox(height: 25),
+                      const Dell1996SectionEyebrow(
+                        title: '1. KONDISI AWAL DITERIMA',
+                        backgroundColor: Dell1996Colors.tintSky,
+                      ),
+                      const SizedBox(height: Dell1996Spacing.md),
+                      _buildPhotoBox(
+                        isUploaded: _fotoAwalUploaded,
+                        isLoading: _isLoading1,
+                        title: "AMBIL FOTO KONDISI AWAL",
+                        onTap: () => _simulasiBukaKamera(1),
+                      ),
+                      const SizedBox(height: Dell1996Spacing.xl),
 
-            const Text(
-              "2. Bukti Kerusakan Komponen",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            ),
-            const SizedBox(height: 10),
-            _buildPhotoBox(
-              isUploaded: _fotoRusakUploaded,
-              isLoading: _isLoading2,
-              title: "Ambil Foto Komponen Rusak",
-              onTap: () => _simulasiBukaKamera(2),
-            ),
-            const SizedBox(height: 25),
+                      const Dell1996SectionEyebrow(
+                        title: '2. BUKTI KERUSAKAN KOMPONEN',
+                        backgroundColor: Dell1996Colors.tintPeach,
+                      ),
+                      const SizedBox(height: Dell1996Spacing.md),
+                      _buildPhotoBox(
+                        isUploaded: _fotoRusakUploaded,
+                        isLoading: _isLoading2,
+                        title: "AMBIL FOTO KOMPONEN RUSAK",
+                        onTap: () => _simulasiBukaKamera(2),
+                      ),
+                      const SizedBox(height: Dell1996Spacing.xl),
 
-            const Text(
-              "3. Kondisi Setelah Diperbaiki",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            ),
-            const SizedBox(height: 10),
-            _buildPhotoBox(
-              isUploaded: _fotoSelesaiUploaded,
-              isLoading: _isLoading3,
-              title: "Ambil Foto Laptop Menyala",
-              onTap: () => _simulasiBukaKamera(3),
-            ),
-            const SizedBox(height: 40),
+                      const Dell1996SectionEyebrow(
+                        title: '3. KONDISI SETELAH DIPERBAIKI',
+                        backgroundColor: Dell1996Colors.tintLime,
+                      ),
+                      const SizedBox(height: Dell1996Spacing.md),
+                      _buildPhotoBox(
+                        isUploaded: _fotoSelesaiUploaded,
+                        isLoading: _isLoading3,
+                        title: "AMBIL FOTO LAPTOP MENYALA",
+                        onTap: () => _simulasiBukaKamera(3),
+                      ),
+                      const SizedBox(height: Dell1996Spacing.section),
 
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.teal,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text("Foto dokumentasi berhasil disimpan!"),
-                    ),
-                  );
-                  Navigator.pop(context);
-                },
-                icon: const Icon(Icons.cloud_upload, color: Colors.white),
-                label: const Text(
-                  "Simpan Dokumentasi",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                      Dell1996CtaBlockRed(
+                        text: "SIMPAN DOKUMENTASI",
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              backgroundColor: Dell1996Colors.canvas,
+                              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                              title: Text("BERHASIL", style: Dell1996Typography.heading2),
+                              content: Text(
+                                "Dokumentasi telah disimpan dengan aman.",
+                                style: Dell1996Typography.body,
+                              ),
+                              actions: [
+                                Dell1996ButtonPrimary(
+                                  text: "KEMBALI",
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                    Navigator.pop(context);
+                                  },
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ],
                   ),
                 ),
               ),
-            ),
-          ],
+              Container(
+                padding: const EdgeInsets.all(Dell1996Spacing.md),
+                color: Dell1996Colors.canvas,
+                child: Dell1996ButtonPrimary(
+                  text: 'BATAL / KEMBALI',
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ),
+              const Dell1996FooterBand(text: 'Modul Kamera Internal diaktifkan.'),
+            ],
+          ),
         ),
       ),
     );
@@ -137,40 +142,29 @@ class _MitraDocumentationPageState extends State<MitraDocumentationPage> {
         height: 150,
         width: double.infinity,
         decoration: BoxDecoration(
-          color: isUploaded ? Colors.teal.withValues(alpha: 0.1) : Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          color: isUploaded ? Dell1996Colors.tintLime : Dell1996Colors.canvas,
           border: Border.all(
-            color: isUploaded ? Colors.teal : Colors.grey.withValues(alpha: 0.5),
-            style: isUploaded ? BorderStyle.solid : BorderStyle.none,
+            color: Dell1996Colors.frameInk,
+            width: 2,
           ),
-          boxShadow: isUploaded
-              ? []
-              : [
-                  const BoxShadow(
-                    color: Colors.black12,
-                    blurRadius: 4,
-                    spreadRadius: 1,
-                  ),
-                ],
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (isLoading)
-              const CircularProgressIndicator(color: Colors.teal)
+              const CircularProgressIndicator(color: Dell1996Colors.primary)
             else
               Icon(
-                isUploaded ? Icons.check_circle : Icons.camera_alt,
-                size: 50,
-                color: isUploaded ? Colors.teal : Colors.grey,
+                isUploaded ? Icons.check_box : Icons.camera_alt,
+                size: 48,
+                color: Dell1996Colors.frameInk,
               ),
 
-            const SizedBox(height: 10),
+            const SizedBox(height: Dell1996Spacing.md),
             if (!isLoading)
               Text(
-                isUploaded ? "Foto Berhasil Diunggah" : title,
-                style: TextStyle(
-                  color: isUploaded ? Colors.teal : Colors.black54,
+                isUploaded ? "FOTO BERHASIL DIUNGGAH" : title,
+                style: Dell1996Typography.body.copyWith(
                   fontWeight: isUploaded ? FontWeight.bold : FontWeight.normal,
                 ),
               ),
@@ -187,7 +181,6 @@ class _MitraDocumentationPageState extends State<MitraDocumentationPage> {
       if (id == 3) _isLoading3 = true;
     });
 
-    // Loading buatan selama 1.5 detik agar terasa nyata
     Future.delayed(const Duration(milliseconds: 1500), () {
       setState(() {
         if (id == 1) {

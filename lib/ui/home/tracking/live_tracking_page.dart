@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../../theme/dell_1996_theme.dart';
+import '../../../widget/dell_1996_components.dart';
 
 class LiveTrackingPage extends StatelessWidget {
   const LiveTrackingPage({super.key});
@@ -14,16 +16,7 @@ class LiveTrackingPage extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          "Tracking Servis",
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Colors.blueAccent,
-        automaticallyImplyLeading: false,
-        centerTitle: true,
-      ),
-      backgroundColor: Colors.grey[100],
+      backgroundColor: Dell1996Colors.canvas,
       body: FutureBuilder<DocumentSnapshot>(
         future: FirebaseFirestore.instance
             .collection('users')
@@ -49,149 +42,176 @@ class LiveTrackingPage extends StatelessWidget {
                 .snapshots();
           }
 
-          return StreamBuilder<QuerySnapshot>(
-            stream: streamPesanan,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              }
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Dell1996TopBanner(
+                title: 'TRACKING SERVIS',
+                subtitle: 'Pantau status perbaikan perangkat Anda',
+                trailingWidget: Dell1996PhoneCallout(phoneNumber: '1-800-SERVIS'),
+              ),
+              Expanded(
+                child: StreamBuilder<QuerySnapshot>(
+                  stream: streamPesanan,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
 
-              if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                return const Center(
-                  child: Text("Belum ada perangkat yang sedang diservis.", style: TextStyle(color: Colors.grey)),
-                );
-              }
+                    if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                      return const Center(
+                        child: Text("Belum ada perangkat yang sedang diservis."),
+                      );
+                    }
 
-              var allOrders = snapshot.data!.docs;
-              
-              // 👇 PENERAPAN FILTER SOFT DELETE & FILTER SELESAI
-              var activeOrders = allOrders.where((doc) {
-                var data = doc.data() as Map<String, dynamic>;
-                bool isSelesai = data['status'] == 'Selesai';
-                bool isDibatalkan = data['status'] == 'Dibatalkan';
-                bool isDeleted = data['is_deleted'] == true;
-                
-                // Hanya tampilkan yang BELUM selesai, BELUM dibatalkan, dan TIDAK dihapus
-                return !isSelesai && !isDibatalkan && !isDeleted;
-              }).toList();
+                    var allOrders = snapshot.data!.docs;
+                    
+                    var activeOrders = allOrders.where((doc) {
+                      var data = doc.data() as Map<String, dynamic>;
+                      bool isSelesai = data['status'] == 'Selesai';
+                      bool isDibatalkan = data['status'] == 'Dibatalkan';
+                      bool isDeleted = data['is_deleted'] == true;
+                      
+                      return !isSelesai && !isDibatalkan && !isDeleted;
+                    }).toList();
 
-              if (activeOrders.isEmpty) {
-                return const Center(
-                  child: Text("Belum ada perangkat yang sedang diservis.", style: TextStyle(color: Colors.grey)),
-                );
-              }
+                    if (activeOrders.isEmpty) {
+                      return const Center(
+                        child: Text("Belum ada perangkat yang sedang diservis."),
+                      );
+                    }
 
-              return ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: activeOrders.length,
-                itemBuilder: (context, index) {
-                  var data = activeOrders[index].data() as Map<String, dynamic>;
-                  String namaPelanggan = data['nama_user'] ?? 'Pelanggan';
+                    return ListView.builder(
+                      padding: const EdgeInsets.all(Dell1996Spacing.lg),
+                      itemCount: activeOrders.length,
+                      itemBuilder: (context, index) {
+                        var data = activeOrders[index].data() as Map<String, dynamic>;
+                        String namaPelanggan = data['nama_user'] ?? 'Pelanggan';
 
-                  int biayaServis = data['biaya_servis'] ?? 0;
-                  String metode = data['metode_penyerahan'] ?? 'Dijemput';
-                  int ongkir = (metode == 'Dijemput') ? 20000 : 0;
-                  int totalBayar = biayaServis + ongkir;
+                        int biayaServis = data['biaya_servis'] ?? 0;
+                        String metode = data['metode_penyerahan'] ?? 'Dijemput';
+                        int ongkir = (metode == 'Dijemput') ? 20000 : 0;
+                        int totalBayar = biayaServis + ongkir;
+                        String status = data['status'] ?? 'Proses';
+                        
+                        Color tintColor;
+                        if (status == 'Menunggu Pembayaran') {
+                          tintColor = Dell1996Colors.tintPeach;
+                        } else if (status == 'Menunggu Teknisi') {
+                          tintColor = Dell1996Colors.tintSky;
+                        } else {
+                          tintColor = Dell1996Colors.tintLime;
+                        }
 
-                  return Card(
-                    elevation: 2,
-                    margin: const EdgeInsets.only(bottom: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: Dell1996Spacing.lg),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Dell1996Colors.frameInk, width: 1),
+                            color: tintColor,
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(data['perangkat'] ?? 'Laptop', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                                decoration: BoxDecoration(
-                                  color: data['status'] == 'Menunggu Pembayaran' ? Colors.purple.withValues(alpha: 0.2) : Colors.orange.withValues(alpha: 0.2),
-                                  borderRadius: BorderRadius.circular(8),
+                                width: double.infinity,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: Dell1996Spacing.md,
+                                  vertical: Dell1996Spacing.s,
                                 ),
-                                child: Text(
-                                  data['status'] ?? 'Proses',
-                                  style: TextStyle(
-                                    color: data['status'] == 'Menunggu Pembayaran' ? Colors.purple : Colors.orange,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 12,
+                                decoration: const BoxDecoration(
+                                  color: Dell1996Colors.canvas,
+                                  border: Border(
+                                    bottom: BorderSide(color: Dell1996Colors.frameInk, width: 1),
                                   ),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      (data['perangkat'] ?? 'LAPTOP').toString().toUpperCase(),
+                                      style: Dell1996Typography.heading3,
+                                    ),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                                      color: Dell1996Colors.frameInk,
+                                      child: Text(
+                                        status.toUpperCase(),
+                                        style: Dell1996Typography.uiLabel.copyWith(color: Dell1996Colors.canvas),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(Dell1996Spacing.md),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    if (role == 'mitra') ...[
+                                      Text("PEMILIK: ${namaPelanggan.toUpperCase()}", style: Dell1996Typography.uiLabel),
+                                      const SizedBox(height: Dell1996Spacing.xs),
+                                    ],
+                                    Text("KATEGORI: ${(data['kategori'] ?? '-').toString().toUpperCase()}", style: Dell1996Typography.body),
+                                    const SizedBox(height: Dell1996Spacing.xs),
+                                    Text("KELUHAN: ${data['keluhan'] ?? '-'}", style: Dell1996Typography.body),
+                                    
+                                    if (status == 'Menunggu Teknisi' && role == 'user') ...[
+                                      const SizedBox(height: Dell1996Spacing.md),
+                                      Dell1996ButtonPrimary(
+                                        text: "BATALKAN PESANAN",
+                                        onPressed: () {
+                                          _konfirmasiBatal(context, activeOrders[index].id);
+                                        },
+                                      ),
+                                    ],
+                                    
+                                    if (status == 'Menunggu Pembayaran' && role == 'user') ...[
+                                      const SizedBox(height: Dell1996Spacing.md),
+                                      Container(
+                                        width: double.infinity,
+                                        padding: const EdgeInsets.all(Dell1996Spacing.sm),
+                                        decoration: BoxDecoration(
+                                          color: Dell1996Colors.canvas,
+                                          border: Border.all(color: Dell1996Colors.frameInk, width: 1),
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text("NOTA TAGIHAN:", style: Dell1996Typography.heading3),
+                                            const SizedBox(height: Dell1996Spacing.xs),
+                                            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text("Biaya Servis", style: Dell1996Typography.body), Text("Rp $biayaServis", style: Dell1996Typography.body)]),
+                                            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text("Ongkos Kirim ($metode)", style: Dell1996Typography.body), Text("Rp $ongkir", style: Dell1996Typography.body)]),
+                                            const Divider(color: Dell1996Colors.frameInk),
+                                            Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                Text("TOTAL TAGIHAN", style: Dell1996Typography.uiLabel),
+                                                Text("Rp $totalBayar", style: Dell1996Typography.heading3),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(height: Dell1996Spacing.md),
+                                      Dell1996CtaBlockRed(
+                                        text: "PILIH PEMBAYARAN & KONFIRMASI",
+                                        onTap: () {
+                                          _tampilkanPopUpBayarUser(context, activeOrders[index].id, metode, totalBayar);
+                                        },
+                                      ),
+                                    ],
+                                  ],
                                 ),
                               ),
                             ],
                           ),
-                          const Divider(height: 20, thickness: 1),
-                          if (role == 'mitra') ...[
-                            Text("Pemilik: $namaPelanggan", style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.indigo)),
-                            const SizedBox(height: 5),
-                          ],
-                          Text("Kategori: ${data['kategori'] ?? '-'}"),
-                          const SizedBox(height: 5),
-                          Text("Keluhan: ${data['keluhan'] ?? '-'}"),
-
-                          // TOMBOL BATALKAN PESANAN
-                          if (data['status'] == 'Menunggu Teknisi' && role == 'user') ...[
-                            const SizedBox(height: 15),
-                            SizedBox(
-                              width: double.infinity,
-                              height: 40,
-                              child: OutlinedButton.icon(
-                                style: OutlinedButton.styleFrom(
-                                  foregroundColor: Colors.red,
-                                  side: const BorderSide(color: Colors.redAccent),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                ),
-                                icon: const Icon(Icons.cancel, size: 18),
-                                label: const Text("Batalkan Pesanan", style: TextStyle(fontWeight: FontWeight.bold)),
-                                onPressed: () {
-                                  _konfirmasiBatal(context, activeOrders[index].id);
-                                },
-                              ),
-                            ),
-                          ],
-
-                          // NOTA PEMBAYARAN
-                          if (data['status'] == 'Menunggu Pembayaran' && role == 'user') ...[
-                            Divider(height: 25, thickness: 1, color: Colors.purple.shade200),
-                            const Text("Rincian Nota Tagihan:", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.purple)),
-                            const SizedBox(height: 8),
-                            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [const Text("Biaya Servis"), Text("Rp $biayaServis")]),
-                            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text("Ongkos Kirim ($metode)"), Text("Rp $ongkir")]),
-                            const SizedBox(height: 4),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text("Total Tagihan", style: TextStyle(fontWeight: FontWeight.bold)),
-                                Text("Rp $totalBayar", style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.purple, fontSize: 16)),
-                              ],
-                            ),
-                            const SizedBox(height: 15),
-                            SizedBox(
-                              width: double.infinity,
-                              height: 45,
-                              child: ElevatedButton.icon(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.purple,
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                ),
-                                icon: const Icon(Icons.account_balance_wallet, color: Colors.white),
-                                label: const Text("Pilih Pembayaran & Konfirmasi", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                                onPressed: () {
-                                  _tampilkanPopUpBayarUser(context, activeOrders[index].id, metode, totalBayar);
-                                },
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              );
-            },
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
           );
         },
       ),
@@ -206,35 +226,46 @@ class LiveTrackingPage extends StatelessWidget {
         return StatefulBuilder(
           builder: (context, setStateDialog) {
             return AlertDialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              title: const Text("Metode Pembayaran", style: TextStyle(fontWeight: FontWeight.bold)),
+              backgroundColor: Dell1996Colors.canvas,
+              shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+              title: Text("METODE PEMBAYARAN", style: Dell1996Typography.heading2),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Total yang harus dibayar: Rp $total", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.purple)),
-                  const SizedBox(height: 15),
-                  RadioListTile<String>(
-                    title: const Text("COD (Bayar Tunai)"),
-                    secondary: const Icon(Icons.money, color: Colors.green),
-                    value: "COD",
-                    groupValue: metodePembayaranTerpilih,
-                    onChanged: (value) => setStateDialog(() => metodePembayaranTerpilih = value!),
+                  Text("TOTAL: Rp $total", style: Dell1996Typography.heading3),
+                  const SizedBox(height: Dell1996Spacing.lg),
+                  Container(
+                    decoration: BoxDecoration(border: Border.all(color: Dell1996Colors.frameInk, width: 1)),
+                    child: RadioListTile<String>(
+                      activeColor: Dell1996Colors.primary,
+                      title: Text("COD (Bayar Tunai)", style: Dell1996Typography.body),
+                      value: "COD",
+                      groupValue: metodePembayaranTerpilih,
+                      onChanged: (value) => setStateDialog(() => metodePembayaranTerpilih = value!),
+                    ),
                   ),
-                  RadioListTile<String>(
-                    title: const Text("Transfer Bank (Simulasi VA)"),
-                    secondary: const Icon(Icons.credit_card, color: Colors.blue),
-                    value: "Transfer",
-                    groupValue: metodePembayaranTerpilih,
-                    onChanged: (value) => setStateDialog(() => metodePembayaranTerpilih = value!),
+                  const SizedBox(height: Dell1996Spacing.sm),
+                  Container(
+                    decoration: BoxDecoration(border: Border.all(color: Dell1996Colors.frameInk, width: 1)),
+                    child: RadioListTile<String>(
+                      activeColor: Dell1996Colors.primary,
+                      title: Text("Transfer Bank (Simulasi)", style: Dell1996Typography.body),
+                      value: "Transfer",
+                      groupValue: metodePembayaranTerpilih,
+                      onChanged: (value) => setStateDialog(() => metodePembayaranTerpilih = value!),
+                    ),
                   ),
                 ],
               ),
               actions: [
-                TextButton(onPressed: () => Navigator.pop(context), child: const Text("Batal")),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-                  onPressed: () async {
+                Dell1996ButtonPrimary(
+                  text: "BATAL",
+                  onPressed: () => Navigator.pop(context),
+                ),
+                Dell1996CtaBlockRed(
+                  text: "KONFIRMASI",
+                  onTap: () async {
                     String statusSelanjutnya = 'Sudah Dibayar';
                     await FirebaseFirestore.instance.collection('pesanan').doc(docId).update({
                       'status': statusSelanjutnya,
@@ -243,11 +274,10 @@ class LiveTrackingPage extends StatelessWidget {
                     if (context.mounted) {
                       Navigator.pop(context);
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text("Pembayaran via $metodePembayaranTerpilih Berhasil!"), backgroundColor: Colors.green),
+                        SnackBar(content: Text("Pembayaran via $metodePembayaranTerpilih Berhasil!")),
                       );
                     }
                   },
-                  child: const Text("Konfirmasi Bayar", style: TextStyle(color: Colors.white)),
                 ),
               ],
             );
@@ -262,16 +292,17 @@ class LiveTrackingPage extends StatelessWidget {
       context: context,
       builder: (BuildContext dialogContext) {
         return AlertDialog(
-          title: const Text("Batalkan Pesanan?"),
-          content: const Text("Apakah Anda yakin ingin membatalkan pesanan servis ini? Data pesanan akan dihapus dan teknisi tidak akan datang."),
+          backgroundColor: Dell1996Colors.canvas,
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+          title: Text("BATALKAN PESANAN?", style: Dell1996Typography.heading2),
+          content: Text("Apakah Anda yakin ingin membatalkan pesanan servis ini? Data pesanan akan dihapus dan teknisi tidak akan datang.", style: Dell1996Typography.body),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text("Tutup")),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
-              onPressed: () async {
+            Dell1996ButtonPrimary(text: "TUTUP", onPressed: () => Navigator.pop(dialogContext)),
+            Dell1996CtaBlockRed(
+              text: "YA, BATALKAN",
+              onTap: () async {
                 Navigator.pop(dialogContext);
                 try {
-                  // 👇 PENERAPAN SOFT DELETE: Mengubah status dan memberi tanda is_deleted
                   await FirebaseFirestore.instance.collection('pesanan').doc(docId).update({
                     'status': 'Dibatalkan',
                     'is_deleted': true 
@@ -279,14 +310,13 @@ class LiveTrackingPage extends StatelessWidget {
 
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Pesanan berhasil dibatalkan."), backgroundColor: Colors.green),
+                      const SnackBar(content: Text("Pesanan berhasil dibatalkan.")),
                     );
                   }
                 } catch (e) {
                   debugPrint("Error membatalkan pesanan: $e");
                 }
               },
-              child: const Text("Ya, Batalkan", style: TextStyle(color: Colors.white)),
             ),
           ],
         );

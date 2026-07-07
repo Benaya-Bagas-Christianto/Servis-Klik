@@ -249,7 +249,7 @@ ThemeData dell1996Theme() {
     ),
 
     // Card Theme
-    cardTheme: const CardTheme(
+    cardTheme: const CardThemeData(
       color: Dell1996Colors.surface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.zero,

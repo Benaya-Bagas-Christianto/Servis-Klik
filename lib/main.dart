@@ -3,12 +3,12 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart'; // 👈 IMPORT BARU UNTUK MENDETEKSI WEB
 
-import 'ui/home/home_page.dart';
+
 import 'ui/home/home_page_dell1996.dart';
 import 'ui/home/tracking/live_tracking_page.dart';
 import 'ui/profile/profile_page.dart';
 import 'ui/auth/login_page.dart';
-import 'ui/dell_1996_demo_page.dart';
+
 import 'theme/dell_1996_theme.dart';
 
 void main() async {
@@ -99,7 +99,7 @@ class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
   final List<Widget> _pages = [
-    const HomePageDell1996(), // 🎨 MENGGUNAKAN VERSI DELL 1996
+    const HomePageDell1996(),
     const LiveTrackingPage(),
     const ProfilePage(),
   ];
@@ -112,62 +112,46 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text(
-              'SERVISKLIK 🔧',
-              style: TextStyle(fontWeight: FontWeight.bold),
+    return Dell1996PageFrame(
+      child: Scaffold(
+        backgroundColor: Dell1996Colors.canvas,
+        body: SafeArea(
+          child: _pages[_selectedIndex],
+        ),
+        bottomNavigationBar: Container(
+          decoration: const BoxDecoration(
+            border: Border(
+              top: BorderSide(color: Dell1996Colors.frameInk, width: 1),
             ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: Dell1996Colors.primary,
-                border: Border.all(color: Dell1996Colors.canvas, width: 1),
-              ),
-              child: const Text(
-                '1-800-SERVIS',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Dell1996IconLabelNav(
+                  icon: Icons.home,
+                  label: 'BERANDA',
+                  isActive: _selectedIndex == 0,
+                  onTap: () => _onItemTapped(0),
                 ),
               ),
-            ),
-          ],
-        ),
-        centerTitle: false,
-        elevation: 0,
-      ),
-      body: _pages[_selectedIndex],
-      bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
-          border: Border(
-            top: BorderSide(color: Dell1996Colors.frameInk, width: 1),
+              Expanded(
+                child: Dell1996IconLabelNav(
+                  icon: Icons.track_changes,
+                  label: 'TRACKING',
+                  isActive: _selectedIndex == 1,
+                  onTap: () => _onItemTapped(1),
+                ),
+              ),
+              Expanded(
+                child: Dell1996IconLabelNav(
+                  icon: Icons.person,
+                  label: 'PROFIL',
+                  isActive: _selectedIndex == 2,
+                  onTap: () => _onItemTapped(2),
+                ),
+              ),
+            ],
           ),
-        ),
-        child: BottomNavigationBar(
-          items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home_outlined),
-              activeIcon: Icon(Icons.home),
-              label: 'BERANDA',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.track_changes_outlined),
-              activeIcon: Icon(Icons.track_changes),
-              label: 'TRACKING',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person_outline),
-              activeIcon: Icon(Icons.person),
-              label: 'PROFIL',
-            ),
-          ],
-          currentIndex: _selectedIndex,
-          onTap: _onItemTapped,
         ),
       ),
     );

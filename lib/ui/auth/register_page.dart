@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart'; // 👇 Import Firebase Auth
 import 'package:cloud_firestore/cloud_firestore.dart'; // 👇 Import Firestore
 import '../../main.dart'; // 👇 Path yang benar menuju main.dart
+import '../../../theme/dell_1996_theme.dart';
+import '../../../widget/dell_1996_components.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -22,9 +24,9 @@ class _RegisterPageState extends State<RegisterPage> {
         _emailController.text.trim().isEmpty ||
         _passwordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Mohon lengkapi Nama, Email, dan Kata Sandi!"),
-          backgroundColor: Colors.redAccent,
+        SnackBar(
+          content: Text("MOHON LENGKAPI NAMA, EMAIL, DAN KATA SANDI!", style: Dell1996Typography.body.copyWith(color: Dell1996Colors.canvas)),
+          backgroundColor: Dell1996Colors.primary,
         ),
       );
       return;
@@ -55,9 +57,9 @@ class _RegisterPageState extends State<RegisterPage> {
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Pendaftaran Berhasil! Membuka aplikasi..."),
-          backgroundColor: Colors.green,
+        SnackBar(
+          content: Text("PENDAFTARAN BERHASIL! MEMBUKA APLIKASI...", style: Dell1996Typography.body.copyWith(color: Dell1996Colors.canvas)),
+          backgroundColor: Dell1996Colors.primary,
         ),
       );
 
@@ -70,8 +72,8 @@ class _RegisterPageState extends State<RegisterPage> {
       setState(() => _isLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("Gagal Daftar: ${e.toString()}"),
-          backgroundColor: Colors.redAccent,
+          content: Text("GAGAL DAFTAR: ${e.toString()}", style: Dell1996Typography.body.copyWith(color: Dell1996Colors.canvas)),
+          backgroundColor: Dell1996Colors.primary,
         ),
       );
     }
@@ -88,106 +90,94 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
-      ),
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text(
-                  "Buat Akun Baru",
-                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 10),
-                const Text(
-                  "Daftar sekarang dan nikmati kemudahan servis IT langsung dari rumahmu.",
-                  style: TextStyle(color: Colors.grey, fontSize: 14),
-                ),
-                const SizedBox(height: 40),
-
-                TextField(
-                  controller: _namaController,
-                  decoration: InputDecoration(
-                    labelText: "Nama Lengkap",
-                    prefixIcon: const Icon(Icons.person_outline),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                TextField(
-                  controller: _phoneController,
-                  keyboardType: TextInputType.phone,
-                  decoration: InputDecoration(
-                    labelText: "Nomor Telepon / WhatsApp",
-                    prefixIcon: const Icon(Icons.phone_android),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                TextField(
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: InputDecoration(
-                    labelText: "Email",
-                    prefixIcon: const Icon(Icons.email_outlined),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                TextField(
-                  controller: _passwordController,
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    labelText: "Kata Sandi",
-                    prefixIcon: const Icon(Icons.lock_outline),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 40),
-
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blueAccent,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+    return Dell1996PageFrame(
+      child: Scaffold(
+        backgroundColor: Dell1996Colors.canvas,
+        body: SafeArea(
+          child: Column(
+            children: [
+              const Dell1996TopBanner(
+                title: 'BUAT AKUN BARU',
+                subtitle: 'Sistem Pendaftaran Pengguna',
+              ),
+              Expanded(
+                child: Center(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(Dell1996Spacing.lg),
+                    child: Container(
+                      padding: const EdgeInsets.all(Dell1996Spacing.xl),
+                      decoration: BoxDecoration(
+                        color: Dell1996Colors.canvas,
+                        border: Border.all(color: Dell1996Colors.frameInk, width: 2),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Dell1996Colors.frameInk,
+                            offset: Offset(4, 4),
+                          )
+                        ],
                       ),
-                    ),
-                    onPressed: _isLoading ? null : _prosesDaftar,
-                    child: _isLoading
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text(
-                            "Daftar Akun",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            "FORMULIR PENDAFTARAN",
+                            style: Dell1996Typography.heading2,
+                          ),
+                          const SizedBox(height: Dell1996Spacing.sm),
+                          Text(
+                            "Daftar sekarang dan nikmati kemudahan servis IT langsung dari rumahmu.",
+                            style: Dell1996Typography.body,
+                          ),
+                          const SizedBox(height: Dell1996Spacing.xl),
+          
+                          Text("NAMA LENGKAP:", style: Dell1996Typography.uiLabel),
+                          const SizedBox(height: Dell1996Spacing.xs),
+                          Dell1996TextInput(controller: _namaController),
+                          const SizedBox(height: Dell1996Spacing.md),
+          
+                          Text("NOMOR TELEPON / WHATSAPP:", style: Dell1996Typography.uiLabel),
+                          const SizedBox(height: Dell1996Spacing.xs),
+                          Dell1996TextInput(controller: _phoneController),
+                          const SizedBox(height: Dell1996Spacing.md),
+          
+                          Text("EMAIL:", style: Dell1996Typography.uiLabel),
+                          const SizedBox(height: Dell1996Spacing.xs),
+                          Dell1996TextInput(controller: _emailController),
+                          const SizedBox(height: Dell1996Spacing.md),
+          
+                          Text("KATA SANDI:", style: Dell1996Typography.uiLabel),
+                          const SizedBox(height: Dell1996Spacing.xs),
+                          Dell1996TextInput(controller: _passwordController, obscureText: true),
+                          const SizedBox(height: Dell1996Spacing.xl),
+          
+                          _isLoading
+                              ? const Center(child: CircularProgressIndicator(color: Dell1996Colors.primary))
+                              : Dell1996CtaBlockRed(
+                                  text: "DAFTAR AKUN",
+                                  onTap: _prosesDaftar,
+                                ),
+                          
+                          const SizedBox(height: Dell1996Spacing.lg),
+                          Center(
+                            child: InkWell(
+                              onTap: () => Navigator.pop(context),
+                              child: Text(
+                                "KEMBALI KE HALAMAN LOG MASUK",
+                                style: Dell1996Typography.body.copyWith(
+                                  decoration: TextDecoration.underline,
+                                  color: Dell1996Colors.primary,
+                                ),
+                              ),
                             ),
                           ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
-                const SizedBox(height: 20),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../../theme/dell_1996_theme.dart';
+import '../../../widget/dell_1996_components.dart';
 
 class GaransiPage extends StatefulWidget {
   const GaransiPage({super.key});
@@ -22,34 +24,37 @@ class _GaransiPageState extends State<GaransiPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: const Text("Ajukan Klaim Garansi", style: TextStyle(fontWeight: FontWeight.bold)),
+          backgroundColor: Dell1996Colors.canvas,
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+          title: Text("AJUKAN KLAIM GARANSI", style: Dell1996Typography.heading2),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                TextField(
-                  controller: perangkatCtrl,
-                  decoration: const InputDecoration(labelText: "Merek & Tipe (Cth: Asus ROG)"),
-                ),
-                const SizedBox(height: 10),
-                TextField(
-                  controller: seriCtrl,
-                  decoration: const InputDecoration(labelText: "Nomor Seri (S/N)"),
-                ),
-                const SizedBox(height: 10),
-                TextField(
-                  controller: alasanCtrl,
-                  maxLines: 2,
-                  decoration: const InputDecoration(labelText: "Alasan Klaim"),
-                ),
+                Text("MEREK & TIPE (CTH: ASUS ROG):", style: Dell1996Typography.uiLabel),
+                const SizedBox(height: Dell1996Spacing.xs),
+                Dell1996TextInput(controller: perangkatCtrl),
+                const SizedBox(height: Dell1996Spacing.md),
+                
+                Text("NOMOR SERI (S/N):", style: Dell1996Typography.uiLabel),
+                const SizedBox(height: Dell1996Spacing.xs),
+                Dell1996TextInput(controller: seriCtrl),
+                const SizedBox(height: Dell1996Spacing.md),
+                
+                Text("ALASAN KLAIM:", style: Dell1996Typography.uiLabel),
+                const SizedBox(height: Dell1996Spacing.xs),
+                Dell1996TextInput(controller: alasanCtrl, maxLines: 2),
               ],
             ),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: const Text("Batal")),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.blueAccent),
+            Dell1996ButtonPrimary(
+              text: "BATAL",
+              onPressed: () => Navigator.pop(context),
+            ),
+            Dell1996ButtonPrimary(
+              text: "KIRIM KLAIM",
               onPressed: () async {
                 if (perangkatCtrl.text.isEmpty || seriCtrl.text.isEmpty || alasanCtrl.text.isEmpty) return;
 
@@ -76,11 +81,13 @@ class _GaransiPageState extends State<GaransiPage> {
                 if (context.mounted) {
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Klaim garansi berhasil diajukan!"), backgroundColor: Colors.green),
+                    SnackBar(
+                      content: Text("KLAIM GARANSI BERHASIL DIAJUKAN!", style: Dell1996Typography.body.copyWith(color: Dell1996Colors.canvas)),
+                      backgroundColor: Dell1996Colors.primary,
+                    ),
                   );
                 }
               },
-              child: const Text("Kirim Klaim", style: TextStyle(color: Colors.white)),
             ),
           ],
         );
@@ -90,78 +97,123 @@ class _GaransiPageState extends State<GaransiPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Klaim Garansi Digital", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.blueAccent,
-        iconTheme: const IconThemeData(color: Colors.white),
-      ),
-      backgroundColor: Colors.grey[100],
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _showFormKlaim,
-        backgroundColor: Colors.blueAccent,
-        icon: const Icon(Icons.add, color: Colors.white),
-        label: const Text("Ajukan Klaim", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-      ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance.collection('klaim_garansi').where('email_user', isEqualTo: currentUser?.email).snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
-          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return const Center(child: Text("Anda belum pernah mengajukan klaim garansi.", style: TextStyle(color: Colors.grey)));
-          }
+    return Dell1996PageFrame(
+      child: Scaffold(
+        backgroundColor: Dell1996Colors.canvas,
+        body: SafeArea(
+          child: Column(
+            children: [
+              const Dell1996TopBanner(
+                title: 'GARANSI DIGITAL',
+                subtitle: 'Portal Pengajuan Klaim',
+              ),
+              Expanded(
+                child: StreamBuilder<QuerySnapshot>(
+                  stream: FirebaseFirestore.instance.collection('klaim_garansi').where('email_user', isEqualTo: currentUser?.email).snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator(color: Dell1996Colors.primary));
+                    }
+                    
+                    var klaimList = [];
+                    if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
+                      klaimList = snapshot.data!.docs.where((doc) {
+                        var data = doc.data() as Map<String, dynamic>;
+                        return data['is_deleted'] != true;
+                      }).toList();
+                    }
 
-          var klaimList = snapshot.data!.docs.where((doc) {
-            var data = doc.data() as Map<String, dynamic>;
-            return data['is_deleted'] != true;
-          }).toList();
-
-          return ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: klaimList.length,
-            itemBuilder: (context, index) {
-              var data = klaimList[index].data() as Map<String, dynamic>;
-              String status = data['status'] ?? 'Menunggu Peninjauan';
-
-              return Card(
-                elevation: 2,
-                margin: const EdgeInsets.only(bottom: 12),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(data['perangkat'] ?? 'Perangkat', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                    return ListView(
+                      padding: const EdgeInsets.all(Dell1996Spacing.lg),
+                      children: [
+                        Dell1996CtaBlockRed(
+                          text: "AJUKAN KLAIM BARU",
+                          onTap: _showFormKlaim,
+                        ),
+                        const SizedBox(height: Dell1996Spacing.section),
+                        
+                        const Dell1996SectionEyebrow(
+                          title: 'RIWAYAT KLAIM',
+                          backgroundColor: Dell1996Colors.tintSky,
+                        ),
+                        const SizedBox(height: Dell1996Spacing.md),
+                        
+                        if (klaimList.isEmpty)
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            padding: const EdgeInsets.all(Dell1996Spacing.lg),
                             decoration: BoxDecoration(
-                              color: status == 'Disetujui' ? Colors.green.withValues(alpha: 0.1) : status == 'Ditolak' ? Colors.red.withValues(alpha: 0.1) : Colors.orange.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(8),
+                              color: Dell1996Colors.canvas,
+                              border: Border.all(color: Dell1996Colors.frameInk, width: 2),
                             ),
                             child: Text(
-                              status,
-                              style: TextStyle(
-                                color: status == 'Disetujui' ? Colors.green : status == 'Ditolak' ? Colors.red : Colors.orange,
-                                fontWeight: FontWeight.bold, fontSize: 12,
-                              ),
+                              "ANDA BELUM PERNAH MENGAJUKAN KLAIM GARANSI.",
+                              style: Dell1996Typography.body,
+                              textAlign: TextAlign.center,
                             ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Text("S/N: ${data['nomor_seri'] ?? '-'}"),
-                      Text("Alasan: ${data['alasan'] ?? '-'}", style: const TextStyle(color: Colors.grey)),
-                    ],
-                  ),
+                          )
+                        else
+                          ...klaimList.map((doc) {
+                            var data = doc.data() as Map<String, dynamic>;
+                            String status = data['status'] ?? 'Menunggu Peninjauan';
+                            
+                            Color statusColor = Dell1996Colors.canvas;
+                            if (status == 'Disetujui') statusColor = Dell1996Colors.tintLime;
+                            if (status == 'Ditolak') statusColor = Dell1996Colors.tintPeach;
+                            
+                            return Container(
+                              margin: const EdgeInsets.only(bottom: Dell1996Spacing.md),
+                              padding: const EdgeInsets.all(Dell1996Spacing.md),
+                              decoration: BoxDecoration(
+                                color: statusColor,
+                                border: Border.all(color: Dell1996Colors.frameInk, width: 2),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        (data['perangkat'] ?? 'Perangkat').toString().toUpperCase(),
+                                        style: Dell1996Typography.heading3,
+                                      ),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          color: Dell1996Colors.canvas,
+                                          border: Border.all(color: Dell1996Colors.frameInk, width: 1),
+                                        ),
+                                        child: Text(
+                                          status.toUpperCase(),
+                                          style: Dell1996Typography.uiLabel,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: Dell1996Spacing.sm),
+                                  Text("S/N: ${data['nomor_seri'] ?? '-'}", style: Dell1996Typography.body),
+                                  const SizedBox(height: Dell1996Spacing.xs),
+                                  Text("ALASAN: ${data['alasan'] ?? '-'}", style: Dell1996Typography.body),
+                                ],
+                              ),
+                            );
+                          }),
+                      ],
+                    );
+                  },
                 ),
-              );
-            },
-          );
-        },
+              ),
+              Container(
+                padding: const EdgeInsets.all(Dell1996Spacing.md),
+                color: Dell1996Colors.canvas,
+                child: Dell1996ButtonPrimary(
+                  text: 'KEMBALI KE MENU',
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

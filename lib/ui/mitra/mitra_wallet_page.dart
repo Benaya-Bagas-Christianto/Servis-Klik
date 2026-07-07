@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../theme/dell_1996_theme.dart';
+import '../../../widget/dell_1996_components.dart';
 
 class MitraWalletPage extends StatefulWidget {
   const MitraWalletPage({super.key});
@@ -11,7 +13,6 @@ class _MitraWalletPageState extends State<MitraWalletPage> {
   int saldoSaatIni = 2450000;
   final TextEditingController _nominalController = TextEditingController();
 
-  // 👇 Data transaksi dinamis
   List<Map<String, dynamic>> riwayatTransaksi = [
     {
       "title": "Servis Asus ROG - Layar Blank",
@@ -32,96 +33,58 @@ class _MitraWalletPageState extends State<MitraWalletPage> {
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.check_circle, color: Colors.green, size: 80),
-                const SizedBox(height: 16),
-                const Text(
-                  "Penarikan Berhasil!",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  "Dana sebesar Rp ${nominal.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')} berhasil dikirim.",
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(color: Colors.grey),
-                ),
-              ],
-            ),
+        return AlertDialog(
+          backgroundColor: Dell1996Colors.canvas,
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+          title: Text("PENARIKAN BERHASIL", style: Dell1996Typography.heading2),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.check_box, color: Dell1996Colors.primary, size: 64),
+              const SizedBox(height: Dell1996Spacing.lg),
+              Text(
+                "Dana sebesar Rp ${nominal.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')} berhasil dikirim.",
+                style: Dell1996Typography.body,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: Dell1996Spacing.xl),
+              Dell1996ButtonPrimary(
+                text: "TUTUP",
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
           ),
         );
       },
     );
-
-    Future.delayed(const Duration(seconds: 2), () {
-      if (mounted) {
-        Navigator.pop(context);
-      }
-    });
   }
 
   void _showErrorDialog(String title, String message) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(
-                  Icons.error_outline,
-                  color: Colors.redAccent,
-                  size: 80,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.redAccent,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  message,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(color: Colors.grey),
-                ),
-                const SizedBox(height: 20),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.redAccent,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text(
-                      "Tutup",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+        return AlertDialog(
+          backgroundColor: Dell1996Colors.canvas,
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+          title: Text(title.toUpperCase(), style: Dell1996Typography.heading2.copyWith(color: Dell1996Colors.primary)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.error, color: Dell1996Colors.primary, size: 64),
+              const SizedBox(height: Dell1996Spacing.lg),
+              Text(
+                message,
+                style: Dell1996Typography.body,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: Dell1996Spacing.xl),
+              Dell1996ButtonPrimary(
+                text: "TUTUP",
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
           ),
         );
       },
@@ -132,93 +95,71 @@ class _MitraWalletPageState extends State<MitraWalletPage> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
+      backgroundColor: Colors.transparent,
       builder: (context) {
-        return Padding(
+        return Container(
+          decoration: BoxDecoration(
+            color: Dell1996Colors.canvas,
+            border: Border.all(color: Dell1996Colors.frameInk, width: 2),
+          ),
           padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
-            left: 20,
-            right: 20,
-            top: 20,
+            bottom: MediaQuery.of(context).viewInsets.bottom + Dell1996Spacing.section,
+            left: Dell1996Spacing.lg,
+            right: Dell1996Spacing.lg,
+            top: Dell1996Spacing.lg,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                "Masukkan Nominal Penarikan",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              Text(
+                "MASUKKAN NOMINAL PENARIKAN",
+                style: Dell1996Typography.heading3,
               ),
-              const SizedBox(height: 15),
-              TextField(
+              const SizedBox(height: Dell1996Spacing.md),
+              Dell1996TextInput(
                 controller: _nominalController,
                 keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  prefixText: "Rp ",
-                  hintText: "Contoh: 500000",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
+                hintText: "Contoh: 500000",
               ),
-              const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.teal,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  onPressed: () {
-                    int nominal = int.tryParse(_nominalController.text) ?? 0;
-                    Navigator.pop(context);
+              const SizedBox(height: Dell1996Spacing.xl),
+              Dell1996CtaBlockRed(
+                text: "KONFIRMASI PENARIKAN",
+                onTap: () {
+                  int nominal = int.tryParse(_nominalController.text) ?? 0;
+                  Navigator.pop(context);
 
-                    if (nominal <= 0) {
-                      _showErrorDialog(
-                        "Nominal Tidak Valid",
-                        "Silakan masukkan angka nominal yang benar dan lebih dari Rp 0.",
-                      );
-                    } else if (nominal > saldoSaatIni) {
-                      _showErrorDialog(
-                        "Saldo Tidak Mencukupi",
-                        "Anda mencoba menarik Rp ${nominal.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')}, namun saldo Anda hanya Rp ${saldoSaatIni.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')}.",
-                      );
-                    } else {
-                      setState(() {
-                        saldoSaatIni -= nominal;
+                  if (nominal <= 0) {
+                    _showErrorDialog(
+                      "Nominal Tidak Valid",
+                      "Silakan masukkan angka nominal yang benar dan lebih dari Rp 0.",
+                    );
+                  } else if (nominal > saldoSaatIni) {
+                    _showErrorDialog(
+                      "Saldo Tidak Mencukupi",
+                      "Anda mencoba menarik Rp ${nominal.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')}, namun saldo Anda hanya Rp ${saldoSaatIni.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')}.",
+                    );
+                  } else {
+                    setState(() {
+                      saldoSaatIni -= nominal;
 
-                        // 👇 Masukkan riwayat penarikan ke daftar teratas
-                        String formatUang = nominal.toString().replaceAllMapped(
-                          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-                          (Match m) => '${m[1]}.',
-                        );
-                        riwayatTransaksi.insert(0, {
-                          "title": "Penarikan Dana ke Rekening",
-                          "date": "Hari ini",
-                          "amount": "- Rp $formatUang",
-                          "isIncome": false,
-                        });
+                      String formatUang = nominal.toString().replaceAllMapped(
+                        RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+                        (Match m) => '${m[1]}.',
+                      );
+                      riwayatTransaksi.insert(0, {
+                        "title": "Penarikan Dana ke Rekening",
+                        "date": "Hari ini",
+                        "amount": "- Rp $formatUang",
+                        "isIncome": false,
                       });
+                    });
 
-                      _showSuccessDialog(nominal);
-                      _nominalController.clear();
-                    }
-                  },
-                  child: const Text(
-                    "Konfirmasi Penarikan",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
+                    _showSuccessDialog(nominal);
+                    _nominalController.clear();
+                  }
+                },
               ),
-              const SizedBox(height: 20),
             ],
           ),
         );
@@ -228,101 +169,89 @@ class _MitraWalletPageState extends State<MitraWalletPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        title: const Text(
-          "Dompet Teknisi",
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Colors.teal,
-        iconTheme: const IconThemeData(color: Colors.white),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
-                    blurRadius: 10,
-                  ),
-                ],
+    return Dell1996PageFrame(
+      child: Scaffold(
+        backgroundColor: Dell1996Colors.canvas,
+        body: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Dell1996TopBanner(
+                title: 'DOMPET TEKNISI',
+                subtitle: 'Sistem Pembayaran Internal',
               ),
-              child: Column(
-                children: [
-                  const Text(
-                    "Total Saldo Aktif",
-                    style: TextStyle(color: Colors.grey, fontSize: 14),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    "Rp ${saldoSaatIni.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')}",
-                    style: const TextStyle(
-                      fontSize: 36,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.teal,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.teal,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(Dell1996Spacing.lg),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(Dell1996Spacing.lg),
+                        decoration: BoxDecoration(
+                          color: Dell1996Colors.yellowSticker,
+                          border: Border.all(color: Dell1996Colors.frameInk, width: 2),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "TOTAL SALDO AKTIF",
+                              style: Dell1996Typography.uiLabel,
+                            ),
+                            const SizedBox(height: Dell1996Spacing.xs),
+                            Text(
+                              "Rp ${saldoSaatIni.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')}",
+                              style: Dell1996Typography.heading1.copyWith(
+                                color: Dell1996Colors.primary,
+                              ),
+                            ),
+                            const SizedBox(height: Dell1996Spacing.lg),
+                            Dell1996ButtonPrimary(
+                              text: "TARIK DANA",
+                              onPressed: _showWithdrawMenu,
+                            ),
+                          ],
                         ),
                       ),
-                      onPressed: _showWithdrawMenu,
-                      icon: const Icon(
-                        Icons.account_balance_wallet,
-                        color: Colors.white,
+                      const SizedBox(height: Dell1996Spacing.section),
+                      
+                      const Dell1996SectionEyebrow(
+                        title: 'RIWAYAT TRANSAKSI',
+                        backgroundColor: Dell1996Colors.tintSky,
                       ),
-                      label: const Text(
-                        "Tarik Dana",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                      const SizedBox(height: Dell1996Spacing.md),
+                      
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: riwayatTransaksi.length,
+                          itemBuilder: (context, index) {
+                            final trx = riwayatTransaksi[index];
+                            return _buildTransactionItem(
+                              trx["title"],
+                              trx["date"],
+                              trx["amount"],
+                              trx["isIncome"],
+                            );
+                          },
                         ),
                       ),
-                    ),
+                    ],
                   ),
-                ],
+                ),
               ),
-            ),
-            const SizedBox(height: 30),
-            const Text(
-              "Riwayat Transaksi",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-
-            // Render riwayat dinamis
-            Expanded(
-              child: ListView.builder(
-                itemCount: riwayatTransaksi.length,
-                itemBuilder: (context, index) {
-                  final trx = riwayatTransaksi[index];
-                  return _buildTransactionItem(
-                    trx["title"],
-                    trx["date"],
-                    trx["amount"],
-                    trx["isIncome"] ? Colors.green : Colors.redAccent,
-                  );
-                },
+              Container(
+                padding: const EdgeInsets.all(Dell1996Spacing.md),
+                color: Dell1996Colors.canvas,
+                child: Dell1996ButtonPrimary(
+                  text: 'KEMBALI KE MENU',
+                  onPressed: () => Navigator.pop(context),
+                ),
               ),
-            ),
-          ],
+              const Dell1996FooterBand(text: 'Dikelola oleh Keuangan Internal.'),
+            ],
+          ),
         ),
       ),
     );
@@ -332,34 +261,51 @@ class _MitraWalletPageState extends State<MitraWalletPage> {
     String title,
     String date,
     String amount,
-    Color amountColor,
+    bool isIncome,
   ) {
-    return Card(
-      elevation: 0,
-      margin: const EdgeInsets.only(bottom: 10),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: amountColor.withValues(alpha: 0.1),
-          child: Icon(
-            amountColor == Colors.green
-                ? Icons.arrow_downward
-                : Icons.arrow_upward,
-            color: amountColor,
-          ),
-        ),
-        title: Text(
-          title,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-        ),
-        subtitle: Text(date, style: const TextStyle(fontSize: 12)),
-        trailing: Text(
-          amount,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: amountColor,
-            fontSize: 14,
-          ),
+    Color tintColor = isIncome ? Dell1996Colors.tintLime : Dell1996Colors.tintPeach;
+    
+    return Container(
+      margin: const EdgeInsets.only(bottom: Dell1996Spacing.sm),
+      decoration: BoxDecoration(
+        color: tintColor,
+        border: Border.all(color: Dell1996Colors.frameInk, width: 1),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(Dell1996Spacing.md),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(Dell1996Spacing.xs),
+              decoration: BoxDecoration(
+                color: Dell1996Colors.canvas,
+                border: Border.all(color: Dell1996Colors.frameInk, width: 1),
+              ),
+              child: Icon(
+                isIncome ? Icons.arrow_upward : Icons.arrow_downward,
+                color: Dell1996Colors.frameInk,
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: Dell1996Spacing.md),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title.toUpperCase(),
+                    style: Dell1996Typography.body.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(date.toUpperCase(), style: Dell1996Typography.bodySm),
+                ],
+              ),
+            ),
+            Text(
+              amount,
+              style: Dell1996Typography.heading3,
+            ),
+          ],
         ),
       ),
     );

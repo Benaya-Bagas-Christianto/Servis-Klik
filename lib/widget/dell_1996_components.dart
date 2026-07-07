@@ -34,11 +34,13 @@ class Dell1996PageFrame extends StatelessWidget {
 class Dell1996TopBanner extends StatelessWidget {
   final String title;
   final String? subtitle;
+  final Widget? trailingWidget;
 
   const Dell1996TopBanner({
     super.key,
     required this.title,
     this.subtitle,
+    this.trailingWidget,
   });
 
   @override
@@ -49,23 +51,34 @@ class Dell1996TopBanner extends StatelessWidget {
         horizontal: Dell1996Spacing.lg,
         vertical: Dell1996Spacing.md,
       ),
-      child: Column(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title.toUpperCase(),
-            style: Dell1996Typography.heading2.copyWith(
-              color: Dell1996Colors.canvas,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title.toUpperCase(),
+                  style: Dell1996Typography.heading2.copyWith(
+                    color: Dell1996Colors.canvas,
+                  ),
+                ),
+                if (subtitle != null) ...[
+                  const SizedBox(height: Dell1996Spacing.xs),
+                  Text(
+                    subtitle!,
+                    style: Dell1996Typography.bodySm.copyWith(
+                      color: Dell1996Colors.canvas,
+                    ),
+                  ),
+                ],
+              ],
             ),
           ),
-          if (subtitle != null) ...[
-            const SizedBox(height: Dell1996Spacing.xs),
-            Text(
-              subtitle!,
-              style: Dell1996Typography.bodySm.copyWith(
-                color: Dell1996Colors.canvas,
-              ),
-            ),
+          if (trailingWidget != null) ...[
+            const SizedBox(width: Dell1996Spacing.md),
+            trailingWidget!,
           ],
         ],
       ),
@@ -384,6 +397,82 @@ class Dell1996FooterBand extends StatelessWidget {
         text,
         style: Dell1996Typography.bodySm,
         textAlign: TextAlign.center,
+      ),
+    );
+  }
+}
+
+/// Text Input - Sharp border with 1px black outline
+class Dell1996TextInput extends StatelessWidget {
+  final TextEditingController? controller;
+  final String? hintText;
+  final bool obscureText;
+  final TextInputType? keyboardType;
+  final int? maxLines;
+
+  const Dell1996TextInput({
+    super.key,
+    this.controller,
+    this.hintText,
+    this.obscureText = false,
+    this.keyboardType,
+    this.maxLines = 1,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Dell1996Colors.canvas,
+        border: Border.all(color: Dell1996Colors.frameInk, width: 1),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 0),
+      child: TextField(
+        controller: controller,
+        obscureText: obscureText,
+        keyboardType: keyboardType,
+        maxLines: maxLines,
+        style: Dell1996Typography.body,
+        decoration: InputDecoration(
+          border: InputBorder.none,
+          hintText: hintText,
+          hintStyle: Dell1996Typography.body.copyWith(color: Colors.grey),
+          isDense: true,
+          contentPadding: const EdgeInsets.symmetric(vertical: 8),
+        ),
+      ),
+    );
+  }
+}
+
+/// Primary Button - Black filled button
+class Dell1996ButtonPrimary extends StatelessWidget {
+  final String text;
+  final VoidCallback? onPressed;
+
+  const Dell1996ButtonPrimary({
+    super.key,
+    required this.text,
+    this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onPressed,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          color: onPressed != null ? Dell1996Colors.frameInk : Colors.grey,
+          border: Border.all(color: Dell1996Colors.frameInk, width: 1),
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          text.toUpperCase(),
+          style: Dell1996Typography.button.copyWith(
+            color: Dell1996Colors.onPrimary,
+          ),
+        ),
       ),
     );
   }

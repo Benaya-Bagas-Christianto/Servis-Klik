@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-// 👇 Sesuaikan import ini ke file main.dart kamu agar setelah login sukses,
-// layar berpindah ke menu utama (AuthWrapper).
-import '../../main.dart';
+import '../../theme/dell_1996_theme.dart';
+import '../../widget/dell_1996_components.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -31,9 +29,6 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  // =========================================================================
-  // FUNGSI UNTUK MERESET PASSWORD (LUPA KATA SANDI)
-  // =========================================================================
   void _showForgotPasswordDialog() {
     final TextEditingController resetEmailController = TextEditingController();
 
@@ -41,70 +36,48 @@ class _LoginPageState extends State<LoginPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: const Row(
-            children: [
-              Icon(Icons.lock_reset, color: Colors.blueAccent),
-              SizedBox(width: 8),
-              Text(
-                "Lupa Kata Sandi",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-            ],
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+          backgroundColor: Dell1996Colors.canvas,
+          title: Text(
+            "LUPA KATA SANDI",
+            style: Dell1996Typography.heading2,
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
+              Text(
                 "Masukkan email yang terdaftar. Kami akan mengirimkan tautan untuk mengatur ulang kata sandi Anda.",
-                style: TextStyle(fontSize: 13, color: Colors.grey),
+                style: Dell1996Typography.body,
               ),
-              const SizedBox(height: 15),
-              TextField(
+              const SizedBox(height: Dell1996Spacing.lg),
+              Dell1996TextInput(
                 controller: resetEmailController,
+                hintText: 'Email Anda',
                 keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(
-                  labelText: 'Email Anda',
-                  prefixIcon: const Icon(Icons.email_outlined),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
               ),
             ],
           ),
           actions: [
-            TextButton(
+            Dell1996ButtonPrimary(
+              text: "Batal",
               onPressed: () => Navigator.pop(context),
-              child: const Text("Batal", style: TextStyle(color: Colors.grey)),
             ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueAccent,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
+            Dell1996ButtonPrimary(
+              text: "Kirim Tautan",
               onPressed: () async {
                 String email = resetEmailController.text.trim();
                 if (email.isEmpty) return;
 
                 try {
-                  // 👇 Ini adalah kode sakti Firebase untuk mengirim email reset!
                   await FirebaseAuth.instance.sendPasswordResetEmail(
                     email: email,
                   );
 
                   if (context.mounted) {
-                    Navigator.pop(context); // Tutup pop-up
+                    Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text(
-                          "Tautan reset kata sandi telah dikirim ke email Anda!",
-                        ),
-                        backgroundColor: Colors.green,
+                        content: Text("Tautan reset kata sandi telah dikirim!"),
                       ),
                     );
                   }
@@ -112,18 +85,11 @@ class _LoginPageState extends State<LoginPage> {
                   if (context.mounted) {
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(e.message ?? "Terjadi kesalahan"),
-                        backgroundColor: Colors.red,
-                      ),
+                      SnackBar(content: Text(e.message ?? "Terjadi kesalahan")),
                     );
                   }
                 }
               },
-              child: const Text(
-                "Kirim Tautan",
-                style: TextStyle(color: Colors.white),
-              ),
             ),
           ],
         );
@@ -136,13 +102,11 @@ class _LoginPageState extends State<LoginPage> {
 
     try {
       if (_isLogin) {
-        // PROSES LOGIN
         await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
         );
       } else {
-        // PROSES REGISTER
         if (_namaController.text.trim().isEmpty) {
           throw Exception("Nama lengkap harus diisi!");
         }
@@ -168,21 +132,15 @@ class _LoginPageState extends State<LoginPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(_isLogin ? "Login Berhasil!" : "Akun berhasil dibuat!"),
-          backgroundColor: Colors.green,
         ),
       );
-
-      // Navigator dihapus karena AuthWrapper di main.dart otomatis mendeteksi perubahan sesi dan akan langsung memindahkan pengguna ke MainScreen.
     } on FirebaseAuthException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.message ?? "Terjadi kesalahan pada Firebase"),
-          backgroundColor: Colors.red,
-        ),
+        SnackBar(content: Text(e.message ?? "Terjadi kesalahan")),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
+        SnackBar(content: Text(e.toString())),
       );
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -191,192 +149,156 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
+    return Dell1996PageFrame(
+      child: Scaffold(
+        backgroundColor: Dell1996Colors.canvas,
+        body: SafeArea(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Icon(Icons.handyman, size: 80, color: Colors.blueAccent),
-              const SizedBox(height: 20),
-
-              Text(
-                _isLogin ? 'Selamat Datang Kembali!' : 'Bergabung Bersama Kami',
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
+              const Dell1996TopBanner(
+                title: 'PORTAL SERVISKLIK',
+                subtitle: 'Akses aman ke sistem perbaikan elektronik',
+                trailingWidget: Dell1996PhoneCallout(phoneNumber: '1-800-SERVIS'),
               ),
-              const SizedBox(height: 10),
-              Text(
-                _isLogin
-                    ? 'Silakan masuk untuk melanjutkan.'
-                    : 'Buat akun untuk mulai menggunakan ServisKlik.',
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 14, color: Colors.grey),
-              ),
-              const SizedBox(height: 30),
+              Expanded(
+                child: Center(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(Dell1996Spacing.xl),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Dell1996Colors.surface,
+                        border: Border.all(color: Dell1996Colors.frameInk, width: 1),
+                      ),
+                      padding: const EdgeInsets.all(Dell1996Spacing.lg),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Text(
+                            _isLogin ? 'LOGIN SISTEM' : 'REGISTRASI SISTEM',
+                            style: Dell1996Typography.display.copyWith(fontSize: 24),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: Dell1996Spacing.lg),
+                          Text(
+                            _isLogin
+                                ? 'Silakan masukkan kredensial Anda.'
+                                : 'Silakan lengkapi formulir pendaftaran.',
+                            style: Dell1996Typography.body,
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: Dell1996Spacing.xl),
+                          
+                          if (!_isLogin) ...[
+                            Text('NAMA LENGKAP', style: Dell1996Typography.uiLabel),
+                            const SizedBox(height: Dell1996Spacing.xs),
+                            Dell1996TextInput(
+                              controller: _namaController,
+                              hintText: 'Nama Lengkap',
+                            ),
+                            const SizedBox(height: Dell1996Spacing.md),
+                          ],
 
-              if (!_isLogin) ...[
-                TextField(
-                  controller: _namaController,
-                  decoration: InputDecoration(
-                    labelText: 'Nama Lengkap',
-                    prefixIcon: const Icon(Icons.person),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 15),
-              ],
+                          Text('EMAIL', style: Dell1996Typography.uiLabel),
+                          const SizedBox(height: Dell1996Spacing.xs),
+                          Dell1996TextInput(
+                            controller: _emailController,
+                            hintText: 'user@example.com',
+                            keyboardType: TextInputType.emailAddress,
+                          ),
+                          const SizedBox(height: Dell1996Spacing.md),
 
-              TextField(
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(
-                  labelText: 'Email',
-                  prefixIcon: const Icon(Icons.email),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 15),
+                          Text('KATA SANDI', style: Dell1996Typography.uiLabel),
+                          const SizedBox(height: Dell1996Spacing.xs),
+                          Dell1996TextInput(
+                            controller: _passwordController,
+                            hintText: '********',
+                            obscureText: true,
+                          ),
+                          const SizedBox(height: Dell1996Spacing.md),
 
-              TextField(
-                controller: _passwordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: 'Kata Sandi',
-                  prefixIcon: const Icon(Icons.lock),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ),
+                          if (_isLogin)
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: InkWell(
+                                onTap: _showForgotPasswordDialog,
+                                child: Text(
+                                  "(Lupa Kata Sandi?)",
+                                  style: Dell1996Typography.link,
+                                ),
+                              ),
+                            ),
 
-              // 👇 TOMBOL LUPA KATA SANDI (Hanya muncul di mode Login)
-              if (_isLogin)
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: _showForgotPasswordDialog,
-                    child: const Text(
-                      "Lupa Kata Sandi?",
-                      style: TextStyle(
-                        color: Colors.blueAccent,
-                        fontWeight: FontWeight.bold,
+                          if (!_isLogin) ...[
+                            Text('TIPE AKUN', style: Dell1996Typography.uiLabel),
+                            const SizedBox(height: Dell1996Spacing.xs),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8),
+                              decoration: BoxDecoration(
+                                color: Dell1996Colors.canvas,
+                                border: Border.all(color: Dell1996Colors.frameInk, width: 1),
+                              ),
+                              child: DropdownButtonHideUnderline(
+                                child: DropdownButton<String>(
+                                  value: _selectedRole,
+                                  isExpanded: true,
+                                  dropdownColor: Dell1996Colors.canvas,
+                                  style: Dell1996Typography.body,
+                                  onChanged: (String? newValue) {
+                                    setState(() {
+                                      _selectedRole = newValue!;
+                                    });
+                                  },
+                                  items: const [
+                                    DropdownMenuItem(
+                                      value: 'user',
+                                      child: Text('Pelanggan (Customer)'),
+                                    ),
+                                    DropdownMenuItem(
+                                      value: 'mitra',
+                                      child: Text('Teknisi (Mitra Servis)'),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: Dell1996Spacing.lg),
+                          ],
+                          
+                          const SizedBox(height: Dell1996Spacing.lg),
+
+                          _isLoading
+                              ? const Center(child: CircularProgressIndicator())
+                              : Dell1996CtaBlockRed(
+                                  text: _isLogin ? 'MASUK KE SISTEM' : 'DAFTARKAN AKUN',
+                                  onTap: _submitForm,
+                                ),
+
+                          const SizedBox(height: Dell1996Spacing.lg),
+
+                          Center(
+                            child: InkWell(
+                              onTap: () {
+                                setState(() {
+                                  _isLogin = !_isLogin;
+                                });
+                              },
+                              child: Text(
+                                _isLogin
+                                    ? 'Belum punya akun? (Daftar)'
+                                    : 'Sudah punya akun? (Masuk)',
+                                style: Dell1996Typography.link,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
                 ),
-
-              if (!_isLogin) const SizedBox(height: 15),
-
-              if (!_isLogin) ...[
-                const Text(
-                  "Mendaftar sebagai:",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                PopupMenuButton<String>(
-                  initialValue: _selectedRole,
-                  offset: const Offset(0, 55), // 👈 Memaksa menu muncul tepat di BAWAH tombol (ke bawah)
-                  constraints: BoxConstraints(
-                    minWidth: MediaQuery.of(context).size.width - 48,
-                    maxWidth: MediaQuery.of(context).size.width - 48,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  onSelected: (String item) {
-                    setState(() {
-                      _selectedRole = item;
-                    });
-                  },
-                  itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                    const PopupMenuItem<String>(
-                      value: 'user',
-                      child: Text('👤 Pelanggan (Customer)'),
-                    ),
-                    const PopupMenuItem<String>(
-                      value: 'mitra',
-                      child: Text('🔧 Teknisi (Mitra Servis)'),
-                    ),
-                  ],
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          _selectedRole == 'user'
-                              ? "👤 Pelanggan (Customer)"
-                              : "🔧 Teknisi (Mitra Servis)",
-                          style: const TextStyle(fontSize: 16, color: Colors.black87),
-                        ),
-                        const Icon(Icons.arrow_drop_down, color: Colors.black54),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-              ],
-
-              const SizedBox(height: 10),
-
-              SizedBox(
-                height: 50,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blueAccent,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  onPressed: _isLoading ? null : _submitForm,
-                  child: _isLoading
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : Text(
-                          _isLogin ? 'Masuk' : 'Daftar Sekarang',
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                ),
               ),
-              const SizedBox(height: 20),
-
-              TextButton(
-                onPressed: () {
-                  setState(() {
-                    _isLogin = !_isLogin;
-                  });
-                },
-                child: Text(
-                  _isLogin
-                      ? 'Belum punya akun? Daftar di sini'
-                      : 'Sudah punya akun? Masuk di sini',
-                  style: const TextStyle(
-                    color: Colors.blueAccent,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+              const Dell1996FooterBand(
+                text: 'Copyright © 2026 ServisKlik. All rights reserved.\nThis site is best viewed with browser versions 3.0 and higher.',
               ),
             ],
           ),

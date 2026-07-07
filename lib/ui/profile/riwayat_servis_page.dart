@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
+import '../../../theme/dell_1996_theme.dart';
+import '../../../widget/dell_1996_components.dart';
 
 class RiwayatServisPage extends StatelessWidget {
   const RiwayatServisPage({super.key});
@@ -10,13 +12,21 @@ class RiwayatServisPage extends StatelessWidget {
     bool? confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("Hapus Riwayat"),
-        content: const Text("Apakah Anda yakin ingin menyembunyikan riwayat servis ini?"),
+        backgroundColor: Dell1996Colors.canvas,
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+        title: Text("HAPUS RIWAYAT", style: Dell1996Typography.heading2),
+        content: Text(
+          "Apakah Anda yakin ingin menyembunyikan riwayat servis ini?",
+          style: Dell1996Typography.body,
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("Batal")),
-          TextButton(
+          Dell1996ButtonPrimary(
+            text: "BATAL",
+            onPressed: () => Navigator.pop(context, false),
+          ),
+          Dell1996ButtonPrimary(
+            text: "HAPUS",
             onPressed: () => Navigator.pop(context, true),
-            child: const Text("Hapus", style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -24,14 +34,16 @@ class RiwayatServisPage extends StatelessWidget {
 
     if (confirm == true) {
       try {
-        // 👇 PENERAPAN SOFT DELETE UNTUK RIWAYAT: Data disembunyikan pakai update
         await FirebaseFirestore.instance.collection('pesanan').doc(docId).update({
           'is_deleted': true
         });
         
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Riwayat berhasil dihapus dari tampilan Anda.")),
+            SnackBar(
+              content: Text("RIWAYAT BERHASIL DIHAPUS.", style: Dell1996Typography.body.copyWith(color: Dell1996Colors.canvas)),
+              backgroundColor: Dell1996Colors.primary,
+            ),
           );
         }
       } catch (e) {
@@ -44,126 +56,190 @@ class RiwayatServisPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final User? currentUser = FirebaseAuth.instance.currentUser;
 
-    if (currentUser == null) return const Scaffold(body: Center(child: Text("Silakan login")));
+    if (currentUser == null) {
+      return Dell1996PageFrame(
+        child: Scaffold(
+          backgroundColor: Dell1996Colors.canvas,
+          body: const Center(
+            child: Text("SILAKAN LOG MASUK TERLEBIH DAHULU."),
+          ),
+        ),
+      );
+    }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Riwayat Servis", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.blueAccent,
-        iconTheme: const IconThemeData(color: Colors.white),
-      ),
-      backgroundColor: Colors.grey[100],
-      body: FutureBuilder<DocumentSnapshot>(
-        future: FirebaseFirestore.instance.collection('users').doc(currentUser.uid).get(),
-        builder: (context, userSnapshot) {
-          if (userSnapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
-
-          String role = 'user';
-          if (userSnapshot.hasData && userSnapshot.data!.exists) {
-            role = (userSnapshot.data!.data() as Map<String, dynamic>)['role'] ?? 'user';
-          }
-
-          Stream<QuerySnapshot> streamRiwayat;
-          if (role == 'mitra') {
-            streamRiwayat = FirebaseFirestore.instance.collection('pesanan').snapshots();
-          } else {
-            streamRiwayat = FirebaseFirestore.instance.collection('pesanan').where('email_user', isEqualTo: currentUser.email).snapshots();
-          }
-
-          return StreamBuilder<QuerySnapshot>(
-            stream: streamRiwayat,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
-
-              if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                return const Center(child: Text("Belum ada riwayat servis.", style: TextStyle(color: Colors.grey)));
-              }
-
-              var allOrders = snapshot.data!.docs;
-              
-              // 👇 FILTERING: Hanya tampilkan status Selesai yang BELUM disembunyikan
-              var riwayatList = allOrders.where((doc) {
-                var data = doc.data() as Map<String, dynamic>;
-                bool isSelesai = data['status'] == 'Selesai';
-                bool isDeleted = data['is_deleted'] == true;
-                return isSelesai && !isDeleted;
-              }).toList();
-
-              if (riwayatList.isEmpty) {
-                return const Center(child: Text("Belum ada riwayat servis yang selesai.", style: TextStyle(color: Colors.grey)));
-              }
-
-              return ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: riwayatList.length,
-                itemBuilder: (context, index) {
-                  var data = riwayatList[index].data() as Map<String, dynamic>;
-                  String namaPelanggan = data['nama_user'] ?? 'Pelanggan';
-
-                  String tanggalSelesai = "Tanggal tidak diketahui";
-                  if (data['waktu_pesan'] != null) {
-                    DateTime dt = (data['waktu_pesan'] as Timestamp).toDate();
-                    tanggalSelesai = DateFormat('dd MMM yyyy, HH:mm').format(dt);
-                  }
-
-                  return Card(
-                    elevation: 2,
-                    margin: const EdgeInsets.only(bottom: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(data['perangkat'] ?? 'Laptop', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                              Row(
+    return Dell1996PageFrame(
+      child: Scaffold(
+        backgroundColor: Dell1996Colors.canvas,
+        body: SafeArea(
+          child: Column(
+            children: [
+              const Dell1996TopBanner(
+                title: 'RIWAYAT SERVIS',
+                subtitle: 'Data Pesanan Selesai',
+              ),
+              Expanded(
+                child: FutureBuilder<DocumentSnapshot>(
+                  future: FirebaseFirestore.instance.collection('users').doc(currentUser.uid).get(),
+                  builder: (context, userSnapshot) {
+                    if (userSnapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator(color: Dell1996Colors.primary));
+                    }
+          
+                    String role = 'user';
+                    if (userSnapshot.hasData && userSnapshot.data!.exists) {
+                      role = (userSnapshot.data!.data() as Map<String, dynamic>)['role'] ?? 'user';
+                    }
+          
+                    Stream<QuerySnapshot> streamRiwayat;
+                    if (role == 'mitra') {
+                      streamRiwayat = FirebaseFirestore.instance.collection('pesanan').snapshots();
+                    } else {
+                      streamRiwayat = FirebaseFirestore.instance.collection('pesanan').where('email_user', isEqualTo: currentUser.email).snapshots();
+                    }
+          
+                    return StreamBuilder<QuerySnapshot>(
+                      stream: streamRiwayat,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return const Center(child: CircularProgressIndicator(color: Dell1996Colors.primary));
+                        }
+          
+                        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                          return Container(
+                            margin: const EdgeInsets.all(Dell1996Spacing.lg),
+                            padding: const EdgeInsets.all(Dell1996Spacing.lg),
+                            decoration: BoxDecoration(
+                              color: Dell1996Colors.canvas,
+                              border: Border.all(color: Dell1996Colors.frameInk, width: 2),
+                            ),
+                            child: Text(
+                              "BELUM ADA RIWAYAT SERVIS.",
+                              style: Dell1996Typography.body,
+                              textAlign: TextAlign.center,
+                            ),
+                          );
+                        }
+          
+                        var allOrders = snapshot.data!.docs;
+                        
+                        var riwayatList = allOrders.where((doc) {
+                          var data = doc.data() as Map<String, dynamic>;
+                          bool isSelesai = data['status'] == 'Selesai';
+                          bool isDeleted = data['is_deleted'] == true;
+                          return isSelesai && !isDeleted;
+                        }).toList();
+          
+                        if (riwayatList.isEmpty) {
+                          return Container(
+                            margin: const EdgeInsets.all(Dell1996Spacing.lg),
+                            padding: const EdgeInsets.all(Dell1996Spacing.lg),
+                            decoration: BoxDecoration(
+                              color: Dell1996Colors.canvas,
+                              border: Border.all(color: Dell1996Colors.frameInk, width: 2),
+                            ),
+                            child: Text(
+                              "BELUM ADA RIWAYAT SERVIS YANG SELESAI.",
+                              style: Dell1996Typography.body,
+                              textAlign: TextAlign.center,
+                            ),
+                          );
+                        }
+          
+                        return ListView.builder(
+                          padding: const EdgeInsets.all(Dell1996Spacing.lg),
+                          itemCount: riwayatList.length,
+                          itemBuilder: (context, index) {
+                            var data = riwayatList[index].data() as Map<String, dynamic>;
+                            String namaPelanggan = data['nama_user'] ?? 'Pelanggan';
+          
+                            String tanggalSelesai = "TANGGAL TIDAK DIKETAHUI";
+                            if (data['waktu_pesan'] != null) {
+                              DateTime dt = (data['waktu_pesan'] as Timestamp).toDate();
+                              tanggalSelesai = DateFormat('dd MMM yyyy, HH:mm').format(dt).toUpperCase();
+                            }
+          
+                            return Container(
+                              margin: const EdgeInsets.only(bottom: Dell1996Spacing.md),
+                              padding: const EdgeInsets.all(Dell1996Spacing.md),
+                              decoration: BoxDecoration(
+                                color: Dell1996Colors.tintSky,
+                                border: Border.all(color: Dell1996Colors.frameInk, width: 2),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                                    decoration: BoxDecoration(color: Colors.green.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(8)),
-                                    child: const Text("Selesai", style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 12)),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        (data['perangkat'] ?? 'Laptop').toString().toUpperCase(),
+                                        style: Dell1996Typography.heading3,
+                                      ),
+                                      Row(
+                                        children: [
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                                            decoration: BoxDecoration(
+                                              color: Dell1996Colors.tintLime,
+                                              border: Border.all(color: Dell1996Colors.frameInk, width: 1),
+                                            ),
+                                            child: Text("SELESAI", style: Dell1996Typography.uiLabel),
+                                          ),
+                                          const SizedBox(width: Dell1996Spacing.sm),
+                                          InkWell(
+                                            onTap: () => _deleteRiwayat(context, riwayatList[index].id),
+                                            child: Container(
+                                              padding: const EdgeInsets.all(2),
+                                              decoration: BoxDecoration(
+                                                color: Dell1996Colors.primary,
+                                                border: Border.all(color: Dell1996Colors.frameInk, width: 1),
+                                              ),
+                                              child: const Icon(Icons.close, color: Dell1996Colors.canvas, size: 16),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
                                   ),
-                                  const SizedBox(width: 8),
-                                  IconButton(
-                                    icon: const Icon(Icons.delete, color: Colors.red),
-                                    constraints: const BoxConstraints(),
-                                    padding: EdgeInsets.zero,
-                                    onPressed: () => _deleteRiwayat(context, riwayatList[index].id),
-                                  ),
+                                  const Divider(color: Dell1996Colors.frameInk, thickness: 1, height: Dell1996Spacing.lg),
+                                  if (role == 'mitra') ...[
+                                    Text("PEMILIK: ${namaPelanggan.toUpperCase()}", style: Dell1996Typography.body.copyWith(fontWeight: FontWeight.bold)),
+                                    const SizedBox(height: Dell1996Spacing.xs),
+                                  ],
+                                  Text("TANGGAL: $tanggalSelesai", style: Dell1996Typography.body),
+                                  if (data['kategori'] != null && data['kategori'].toString().trim().isNotEmpty) ...[
+                                    const SizedBox(height: Dell1996Spacing.xs),
+                                    Text("KATEGORI: ${(data['kategori']).toString().toUpperCase()}", style: Dell1996Typography.body),
+                                  ],
+                                  if (data['keluhan'] != null && data['keluhan'].toString().trim().isNotEmpty) ...[
+                                    const SizedBox(height: Dell1996Spacing.xs),
+                                    Text("KELUHAN: ${(data['keluhan']).toString().toUpperCase()}", style: Dell1996Typography.body),
+                                  ],
+                                  if (data['alamat'] != null && data['alamat'].toString().trim().isNotEmpty) ...[
+                                    const SizedBox(height: Dell1996Spacing.xs),
+                                    Text("ALAMAT: ${(data['alamat']).toString().toUpperCase()}", style: Dell1996Typography.body),
+                                  ],
                                 ],
                               ),
-                            ],
-                          ),
-                          const Divider(height: 20, thickness: 1),
-                          if (role == 'mitra') ...[
-                            Text("Pemilik: $namaPelanggan", style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.indigo)),
-                            const SizedBox(height: 5),
-                          ],
-                          Text("Tanggal: $tanggalSelesai", style: const TextStyle(color: Colors.grey, fontSize: 13)),
-                          if (data['kategori'] != null && data['kategori'].toString().trim().isNotEmpty) ...[
-                            Text("Kategori: ${data['kategori']}"),
-                            const SizedBox(height: 5),
-                          ],
-                          if (data['keluhan'] != null && data['keluhan'].toString().trim().isNotEmpty) ...[
-                            Text("Keluhan: ${data['keluhan']}"),
-                            const SizedBox(height: 5),
-                          ],
-                          if (data['alamat'] != null && data['alamat'].toString().trim().isNotEmpty) ...[
-                            Text("Alamat: ${data['alamat']}"),
-                            const SizedBox(height: 5),
-                          ],
-                        ], // 👈 KEMBALIKAN KURUNG SIKU INI
-                      ),
-                    ),
-                  );
-                },
-              );
-            },
-          );
-        },
+                            );
+                          },
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.all(Dell1996Spacing.md),
+                color: Dell1996Colors.canvas,
+                child: Dell1996ButtonPrimary(
+                  text: 'KEMBALI KE MENU',
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
